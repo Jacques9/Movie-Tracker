@@ -35,7 +35,6 @@ def get_movies():
         params['page'] = i
         response = requests.get(DISCOVER_URL, params=params)
         results = response.json().get('results')
-        movies.extend(results)
         
         for result in results:
             genre_names = [genre_map.get(genre_id) for genre_id in result['genre_ids']]
@@ -50,7 +49,6 @@ def get_movies():
                 'overview': result['overview'],
                 'poster_path': result['poster_path'],
                 'backdrop_path': result['backdrop_path'],
-                'genre_ids': result['genre_ids'],
                 'original_language': result['original_language'],
                 'adult': result['adult'],
                 'video': result['video'],
@@ -62,10 +60,7 @@ def get_movies():
             time.sleep(10)
 
     with open('Movie-Analytics/movies.json', 'a') as f:
-        for movie in movies:
-            json.dump(movie, f)
-            f.write('\n')
+        json.dump(movies, f, indent=4)
 
 if __name__ == '__main__':
     get_movies()
-    
