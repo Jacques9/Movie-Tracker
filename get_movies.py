@@ -31,7 +31,7 @@ def get_movies():
     BASE_URL, DISCOVER_URL, GENRE_URL, params, genre_map = setup()
     movies = []
 
-    for i in range(1, 40):
+    for i in range(1, 340):
         params['page'] = i
         response = requests.get(DISCOVER_URL, params=params)
         results = response.json().get('results')
