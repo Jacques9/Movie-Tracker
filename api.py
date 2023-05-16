@@ -41,7 +41,8 @@ def register(user: UsersReq):
     user_data = {
         'username': user.username,
         'password': hash_password(user.password),
-        'email': user.email
+        'email': user.email,
+        'favourites' : [] # array of objectid's
     }
 
     users_collection.create_user(user_data)
