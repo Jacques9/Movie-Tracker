@@ -16,8 +16,8 @@ class Users:
     def create_user(self, user_data: dict):
         self.collection.insert_one(user_data)
 
-    def check_user_exists(self, email: str) -> bool:
-        return self.collection.find_one({'email': email}) is not None
+    def check_user_exists(self, email: str):
+        return self.collection.find_one({'email': email})
 
 app = FastAPI()
 
@@ -47,3 +47,15 @@ def register(user: UsersReq):
     users_collection.create_user(user_data)
 
     return {'message': 'user created'}
+
+@app.post('/login')
+def login(user: UsersReq):
+    if (db_user := users_collection.check_user_exists(user.email)) is None:
+        return {'message': 'User does not exist'}
+    
+    import bcrypt
+    hashed_password = db_user['password']
+    if not bcrypt.checkpw(user.password.encode('utf-8'), hashed_password.encode('utf-8')):
+        return {'message': 'Invalid password'}
+    
+    return {'message': 'Login succesful'}
