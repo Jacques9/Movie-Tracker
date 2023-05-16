@@ -1,5 +1,4 @@
-import sys, json
-sys.path.append('/home/norby/Coding/Projectz/Movie_Analytics/')
+import json
 from config import CON_STR_NEO4J, PASS
 from neo4j import GraphDatabase
 
@@ -23,7 +22,7 @@ def add_movie(tx, movie):
     tx.run(query, **movie)
 
 
-with open('Movie-Analytics/movies.json') as f:
+with open('Movie-Tracker/movies.json') as f:
         movies = json.load(f)
 
 driver = GraphDatabase.driver(CON_STR_NEO4J, auth=('neo4j', PASS))
