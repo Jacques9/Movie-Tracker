@@ -1,5 +1,5 @@
 from config import DB_NAME, CON_STR
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pydantic import BaseModel
@@ -8,6 +8,13 @@ class UsersReq(BaseModel):
     username: str
     password: str
     email: str
+
+class LoginReq(BaseModel):
+    email: str
+    password: str
+
+class MovieReq(BaseModel):
+    title: str
 
 class Users:
     def __init__(self, collection: Collection) -> None:
@@ -19,13 +26,21 @@ class Users:
     def check_user_exists(self, email: str):
         return self.collection.find_one({'email': email})
 
+class Movies:
+    def __init__(self, collection: Collection) -> None:
+        self.collection = collection
+    
+    def find_movie(self, title: str):
+        return self.collection.find_one({'title': title})
+
 app = FastAPI()
 
 from db_connect import users_collection, movies_collection
 
 users_collection = Users(users_collection)
+movies_collection = Movies(movies_collection)
 
-@app.post('/user')
+@app.post('/user/register')
 def register(user: UsersReq):
     def hash_password(password):
         import bcrypt
@@ -49,8 +64,8 @@ def register(user: UsersReq):
 
     return {'message': 'user created'}
 
-@app.post('/login')
-def login(user: UsersReq):
+@app.post('/user/login')
+def login(user: LoginReq):
     if (db_user := users_collection.check_user_exists(user.email)) is None:
         return {'message': 'User does not exist'}
     
@@ -60,3 +75,12 @@ def login(user: UsersReq):
         return {'message': 'Invalid password'}
     
     return {'message': 'Login succesful'}
+
+@app.get('/movie/find')
+def get_movie(movie: MovieReq):
+    result = movies_collection.find_movie(movie.title)
+
+    if result is None:
+        return {'message': 'Invalid password'}
+    
+    return result
