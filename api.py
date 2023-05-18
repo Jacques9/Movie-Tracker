@@ -1,7 +1,9 @@
 from config import DB_NAME, CON_STR
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from pymongo.collection import Collection
 from pydantic import BaseModel
+import json
 
 class UsersReq(BaseModel):
     username: str
@@ -13,7 +15,7 @@ class LoginReq(BaseModel):
     password: str
 
 class MovieReq(BaseModel):
-    id: int
+    id_movie: int
 
 class Users:
     def __init__(self, collection: Collection) -> None:
@@ -29,8 +31,8 @@ class Movies:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
     
-    def find_movie(self, id: int):
-        return self.collection.find_one({'id_movie': id})
+    def find_movie(self, id_movie: int):
+        return self.collection.find_one({'id_movie': id_movie})
 
 app = FastAPI()
 
@@ -75,12 +77,21 @@ def login(user: LoginReq):
     
     return {'message': 'Login succesful'}
 
+
 @app.get('/movie/find')
 def get_movie(movie: MovieReq):
     result = movies_collection.find_movie(movie.id_movie)
 
     if result is None:
         return {'message': 'Movie not found'}
+
+    return {
+        'title': result['title'],
+        'release_date': result['release_date'],
+        'popularity': result['popularity'],
+        'poster_path': result['poster_path'],
+        'backdrop_path': result['backdrop_path'],
+        'genre_names': result['genre_names']
+    }
+
     
-    print(result)
-    return result
