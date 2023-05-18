@@ -34,6 +34,10 @@ class Movies:
     def find_movie(self, id: int):
         return self.collection.find_one({'id': id})
 
+    def get_all_movies(self):
+        return self.collection.find()
+
+    
 app = FastAPI()
 
 from db_connect import users_collection, movies_collection
@@ -94,4 +98,17 @@ def get_movie(movie: MovieReq):
         'genre_names': result['genre_names']
     }
 
-    
+@app.get('/movie/all')
+def get_all_movies():
+    movies = movies_collection.get_all_movies()
+    movies = list(movies)
+
+    movies = list(
+        map(
+            lambda movie: {
+                k: v for k, v in movie.items() if k!= '_id'
+            }, movies
+        )
+    )
+        
+    return movies
