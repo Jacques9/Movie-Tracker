@@ -1,9 +1,7 @@
 from config import DB_NAME, CON_STR
-from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
+from fastapi import FastAPI, HTTPException
 from pymongo.collection import Collection
 from pydantic import BaseModel
-import json
 
 class UsersReq(BaseModel):
     username: str
@@ -56,8 +54,8 @@ def register(user: UsersReq):
         return hashed_password.decode('utf-8')
 
     if users_collection.check_user_exists(user.email):
-        return {'message': 'user already exists'}
-
+        raise HTTPException(status_code=400, detail='User already exists')
+    
     user_data = {
         'username': user.username,
         'password': hash_password(user.password),
@@ -65,19 +63,22 @@ def register(user: UsersReq):
         'favourites' : [] # array of objectid's
     }
 
-    users_collection.create_user(user_data)
+    try:
+        users_collection.create_user(user_data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='User registration failed')
 
-    return {'message': 'user created'}
+    return {'message': 'User created'}
 
 @app.post('/user/login')
 def login(user: LoginReq):
     if (db_user := users_collection.check_user_exists(user.email)) is None:
-        return {'message': 'User does not exist'}
+        raise HTTPException(status_code=404, detail='User does not exist')
     
     import bcrypt
     hashed_password = db_user['password']
     if not bcrypt.checkpw(user.password.encode('utf-8'), hashed_password.encode('utf-8')):
-        return {'message': 'Invalid password'}
+        raise HTTPException(status_code=401, detail='Invalid password')
     
     return {'message': 'Login succesful'}
 
@@ -87,7 +88,7 @@ def get_movie(movie: MovieReq):
     result = movies_collection.find_movie(movie.id)
 
     if result is None:
-        return {'message': 'Movie not found'}
+        raise HTTPException(status_code=404, detail='Movie not found')
 
     return {
         'title': result['title'],
