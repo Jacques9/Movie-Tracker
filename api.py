@@ -1,6 +1,5 @@
 from config import DB_NAME, CON_STR
-from fastapi import FastAPI, Query
-from pymongo import MongoClient
+from fastapi import FastAPI
 from pymongo.collection import Collection
 from pydantic import BaseModel
 
