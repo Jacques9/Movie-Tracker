@@ -13,7 +13,7 @@ class LoginReq(BaseModel):
     password: str
 
 class MovieReq(BaseModel):
-    title: str
+    id: int
 
 class Users:
     def __init__(self, collection: Collection) -> None:
@@ -29,8 +29,8 @@ class Movies:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
     
-    def find_movie(self, title: str):
-        return self.collection.find_one({'title': title})
+    def find_movie(self, id: int):
+        return self.collection.find_one({'id_movie': id})
 
 app = FastAPI()
 
@@ -77,9 +77,10 @@ def login(user: LoginReq):
 
 @app.get('/movie/find')
 def get_movie(movie: MovieReq):
-    result = movies_collection.find_movie(movie.title)
+    result = movies_collection.find_movie(movie.id_movie)
 
     if result is None:
-        return {'message': 'Invalid password'}
+        return {'message': 'Movie not found'}
     
+    print(result)
     return result
