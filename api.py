@@ -1,5 +1,5 @@
 from config import DB_NAME, CON_STR
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pymongo.collection import Collection
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
@@ -32,7 +32,11 @@ class Users:
         return self.collection.find()
     
     def get_user(self, id: str):
-        return self.collection.find_one({"_id": ObjectId(id)})
+        return self.collection.find_one({'_id': ObjectId(id)})
+    
+    def delete_user(self, id: str):
+        result = self.collection.delete_one({'_id': ObjectId(id)})
+        return result.deleted_count > 0
 
 class Movies:
     def __init__(self, collection: Collection) -> None:
@@ -94,9 +98,9 @@ def login(user: LoginReq):
     return {'message': 'Login succesful'}
 
 
-@app.get('/movie/find')
-def get_movie(movie: MovieReq):
-    result = movies_collection.get_movie(movie.id)
+@app.get('/movie/find/{id}')
+def get_movie(id: int):
+    result = movies_collection.get_movie(id)
 
     if result is None:
         raise HTTPException(status_code=404, detail='Movie not found')
@@ -110,7 +114,7 @@ def get_movie(movie: MovieReq):
         'genre_names': result['genre_names']
     }
 
-@app.get('/movie/all')
+@app.get('/movies/all')
 def get_all_movies():
     movies = movies_collection.get_all_movies()
     movies = list(movies)
@@ -140,9 +144,9 @@ def get_all_users():
 
     return users
 
-@app.get('/user/find')
-def get_user(user: UserReq):
-    result = users_collection.get_user(user.id)
+@app.get('/users/find/{id}')
+def get_user(id: str):
+    result = users_collection.get_user(id)
     
     if result is None:
         raise HTTPException(status_code=404, detail='User not found')
@@ -155,3 +159,10 @@ def get_user(user: UserReq):
         'created_at': result['created_at'],
         'type': result['type']
     }
+
+@app.delete('/users/delete/{id}')
+def del_user(id: str):
+    if users_collection.delete_user(id):
+        return {'message': 'User deleted succesfully'}
+    else:
+        raise HTTPException(status_code=404, detail='User not found')
