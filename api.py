@@ -1,8 +1,8 @@
 from config import DB_NAME, CON_STR
 from fastapi import FastAPI, HTTPException
 from pymongo.collection import Collection
-from pydantic import BaseModel
-
+from pydantic import BaseModel, Field
+from bson.objectid import ObjectId
 class UsersReq(BaseModel):
     username: str
     password: str
@@ -14,6 +14,9 @@ class LoginReq(BaseModel):
 
 class MovieReq(BaseModel):
     id: int
+
+class UserReq(BaseModel):
+    id: str = Field(..., alias='_id')
 
 class Users:
     def __init__(self, collection: Collection) -> None:
@@ -27,17 +30,19 @@ class Users:
     
     def get_all_users(self):
         return self.collection.find()
+    
+    def get_user(self, id: str):
+        return self.collection.find_one({"_id": ObjectId(id)})
 
 class Movies:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
     
-    def find_movie(self, id: int):
+    def get_movie(self, id: int):
         return self.collection.find_one({'id': id})
 
     def get_all_movies(self):
         return self.collection.find()
-
     
 app = FastAPI()
 
@@ -58,11 +63,14 @@ def register(user: UsersReq):
 
     if users_collection.check_user_exists(user.email):
         raise HTTPException(status_code=400, detail='User already exists')
-    
+
+    from datetime import datetime
     user_data = {
         'username': user.username,
         'password': hash_password(user.password),
         'email': user.email,
+        'created_at': datetime.today(),
+        'type' : 'user',
         'favourites' : [] # array of objectid's
     }
 
@@ -88,7 +96,7 @@ def login(user: LoginReq):
 
 @app.get('/movie/find')
 def get_movie(movie: MovieReq):
-    result = movies_collection.find_movie(movie.id)
+    result = movies_collection.get_movie(movie.id)
 
     if result is None:
         raise HTTPException(status_code=404, detail='Movie not found')
@@ -126,8 +134,24 @@ def get_all_users():
         raise HTTPException(status_code=404, detail='There are no users in DB')
 
     users = [{
-        field: str(user[field]) if field == '_id' else user[field] for field in ['_id', 'username', 'email', 'password']
+        field: str(user[field]) if field == '_id' else user[field] for field in ['_id', 'username', 'email', 'password', 'type', 'created_at']
     } 
     for user in users]
 
     return users
+
+@app.get('/user/find')
+def get_user(user: UserReq):
+    result = users_collection.get_user(user.id)
+    
+    if result is None:
+        raise HTTPException(status_code=404, detail='User not found')
+
+
+    return {
+        '_id': str(result['_id']),
+        'username': result['username'],
+        'email': result['email'],
+        'created_at': result['created_at'],
+        'type': result['type']
+    }
