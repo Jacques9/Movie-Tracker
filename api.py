@@ -24,6 +24,9 @@ class Users:
 
     def check_user_exists(self, email: str):
         return self.collection.find_one({'email': email})
+    
+    def get_all_users(self):
+        return self.collection.find()
 
 class Movies:
     def __init__(self, collection: Collection) -> None:
@@ -113,3 +116,18 @@ def get_all_movies():
     )
         
     return movies
+
+@app.get('/users/all')
+def get_all_users():
+    users = users_collection.get_all_users()
+    users = list(users)
+    
+    if len(users) == 0:
+        raise HTTPException(status_code=404, detail='There are no users in DB')
+
+    users = [{
+        field: str(user[field]) if field == '_id' else user[field] for field in ['_id', 'username', 'email', 'password']
+    } 
+    for user in users]
+
+    return users
