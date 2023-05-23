@@ -37,6 +37,19 @@ class Users:
     def delete_user(self, id: str):
         result = self.collection.delete_one({'_id': ObjectId(id)})
         return result.deleted_count > 0
+    
+    def update(self, id: str, field: str, val: str):
+        update_query = {
+            '$set' : {field: val}
+        }
+
+        update_res = self.collection.update_one(
+            {'_id': ObjectId(id)},
+            update_query
+        )
+
+        return update_res.modified_count
+
 
 class Movies:
     def __init__(self, collection: Collection) -> None:
@@ -177,3 +190,14 @@ def del_movie(id: int):
         return {'message' : 'Movie deleted succesfully'}
     else:
         raise HTTPException(status_code=404, detail='Movie not found')
+    
+@app.put('/user/email/{id}') # url /user/email/{id}?email={email}
+def replace_email(id: str, email: str):
+    if not users_collection.get_user(id):
+        raise HTTPException(status_code=404, detail='User not found')
+
+    users_collection.update(id, 'email', email)
+
+    return {
+        'message': 'Email updated succesfully'
+    }
