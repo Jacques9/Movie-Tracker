@@ -3,6 +3,10 @@ from fastapi import FastAPI, HTTPException, Query
 from pymongo.collection import Collection
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
+from datetime import datetime, timedelta
+import secrets
+import jwt
+
 class UsersReq(BaseModel):
     username: str
     password: str
@@ -21,6 +25,7 @@ class UserReq(BaseModel):
 class Users:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
+        self.SECRET_KEY = secrets.token_urlsafe(32)
     
     def create_user(self, user_data: dict):
         self.collection.insert_one(user_data)
@@ -49,8 +54,27 @@ class Users:
         )
 
         return update_res.modified_count
+    
+    def generate_token(self, user_id: str, user_type):
+        expires_delta = timedelta(minutes=30)
+        expire = datetime.utcnow() + expires_delta
 
+        payload = {
+            "user_id": user_id, 
+            "user_type": user_type,
+            "exp": expire
+        }
+        token = jwt.encode(payload, self.SECRET_KEY, algorithm="HS256")
 
+        return token   
+
+    def get_token_info(self, access_token: str):
+        token_info = jwt.decode(access_token, verify=False, algorithms="HS256", key=self.SECRET_KEY)
+
+        user_id = token_info.get("user_id")
+        user_type = token_info.get("user_type")
+
+        return user_id, user_type
 class Movies:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
@@ -112,8 +136,14 @@ def login(user: LoginReq):
     if not bcrypt.checkpw(user.password.encode('utf-8'), hashed_password.encode('utf-8')):
         raise HTTPException(status_code=401, detail='Invalid password')
     
-    return {'message': 'Login succesful'}
+    user_id = str(db_user['_id'])
+    user_type = db_user['type']
+    token = users_collection.generate_token(user_id, user_type)
 
+    return {
+        'message': 'Login succesful',
+        'access_token': token
+    }
 
 @app.get('/movie/find/{id}')
 def get_movie(id: int):
