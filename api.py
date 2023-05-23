@@ -1,5 +1,5 @@
 from config import DB_NAME, CON_STR
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Header
 from pymongo.collection import Collection
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
@@ -49,8 +49,7 @@ class Users:
         }
 
         update_res = self.collection.update_one(
-            {'_id': ObjectId(id)},
-            update_query
+            {'_id': ObjectId(id)}, update_query
         )
 
         return update_res.modified_count
@@ -75,6 +74,13 @@ class Users:
         user_type = token_info.get("user_type")
 
         return user_id, user_type
+    
+    def destroy_token(self, access_token: str):
+        token_info = jwt.decode(access_token, verify=False, algorithms="HS256", key=self.SECRET_KEY)
+        token_info['exp'] = datetime.utcnow() - timedelta(minutes=1)
+        token = jwt.encode(token_info, self.SECRET_KEY, algorithm="HS256")
+        return token.decode('utf-8')
+    
 class Movies:
     def __init__(self, collection: Collection) -> None:
         self.collection = collection
@@ -262,4 +268,13 @@ def replace_pass(id: str, pw: str):
 
     return {
         'message': 'Password updated succesfully'
+    }
+
+@app.post('/user/logout')
+def logout(access_token: str = Header(...)):
+    user_id, user_type = users_collection.get_token_info(access_token)
+    invalidated_token = users_collection.destroy_token(access_token)
+
+    return {
+        'message': 'Logout succesful'
     }
