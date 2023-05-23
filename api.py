@@ -127,7 +127,6 @@ def get_all_movies():
         )
     )
          
-         
     return movies
 
 @app.get('/users/all')
