@@ -191,7 +191,7 @@ def del_movie(id: int):
     else:
         raise HTTPException(status_code=404, detail='Movie not found')
     
-@app.put('/user/email/{id}') # url /user/email/{id}?email={email}
+@app.put('/user/email/{id}') # url /user/email/{id}?email={new_email}
 def replace_email(id: str, email: str):
     if not users_collection.get_user(id):
         raise HTTPException(status_code=404, detail='User not found')
@@ -200,4 +200,15 @@ def replace_email(id: str, email: str):
 
     return {
         'message': 'Email updated succesfully'
+    }
+
+@app.put('/user/username/{id}') # url /user/username/{id}?usr={new_username}
+def replace_usr(id: str, usr: str):
+    if not users_collection.get_user(id):
+        raise HTTPException(status_code=404, detail='User not found')
+    
+    users_collection.update(id, 'username', usr)
+
+    return {
+        'message': 'Username updated succesfully'
     }
