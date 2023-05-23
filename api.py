@@ -47,6 +47,10 @@ class Movies:
 
     def get_all_movies(self):
         return self.collection.find()
+
+    def delete_movie(self, id: int):
+        result = self.collection.delete_one({'id': id})
+        return result.deleted_count > 0
     
 app = FastAPI()
 
@@ -167,3 +171,10 @@ def del_user(id: str):
         return {'message': 'User deleted succesfully'}
     else:
         raise HTTPException(status_code=404, detail='User not found')
+    
+@app.delete('/movie/delete/{id}')
+def del_movie(id: int):
+    if movies_collection.delete_movie(id):
+        return {'message' : 'Movie deleted succesfully'}
+    else:
+        raise HTTPException(status_code=404, detail='Movie not found')
