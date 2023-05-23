@@ -191,7 +191,7 @@ def del_movie(id: int):
     else:
         raise HTTPException(status_code=404, detail='Movie not found')
     
-@app.put('/user/email/{id}') # url /user/email/{id}?email={new_email}
+@app.put('/users/email/{id}') # url /users/email/{id}?email={new_email}
 def replace_email(id: str, email: str):
     if not users_collection.get_user(id):
         raise HTTPException(status_code=404, detail='User not found')
@@ -202,7 +202,7 @@ def replace_email(id: str, email: str):
         'message': 'Email updated succesfully'
     }
 
-@app.put('/user/username/{id}') # url /user/username/{id}?usr={new_username}
+@app.put('/users/username/{id}') # url /users/username/{id}?usr={new_username}
 def replace_usr(id: str, usr: str):
     if not users_collection.get_user(id):
         raise HTTPException(status_code=404, detail='User not found')
@@ -211,4 +211,25 @@ def replace_usr(id: str, usr: str):
 
     return {
         'message': 'Username updated succesfully'
+    }
+
+@app.put('/users/password/{id}') # url /users/username/{id}?pw={new_password}
+def replace_pass(id: str, pw: str):
+    def hash_password(password):
+        import bcrypt
+        salt = bcrypt.gensalt()
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+
+        return hashed_password.decode('utf-8')
+    
+    if not users_collection.get_user(id):
+        raise HTTPException(status_code=404, detail='User not found')
+    
+    hashed_pass = hash_password(pw)
+
+    users_collection.update(id, 'password', hashed_pass)
+
+    return {
+        'message': 'Password updated succesfully'
     }
