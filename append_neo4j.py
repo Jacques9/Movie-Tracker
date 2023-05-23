@@ -1,6 +1,6 @@
-import json
 from config import CON_STR_NEO4J, PASS
 from neo4j import GraphDatabase
+import json
 
 def add_movie(tx, movie):
     query = (
@@ -22,7 +22,7 @@ def add_movie(tx, movie):
     tx.run(query, **movie)
 
 
-with open('Movie-Tracker/movies.json') as f:
+with open('movies.json') as f:
         movies = json.load(f)
 
 driver = GraphDatabase.driver(CON_STR_NEO4J, auth=('neo4j', PASS))
@@ -30,4 +30,5 @@ driver = GraphDatabase.driver(CON_STR_NEO4J, auth=('neo4j', PASS))
 with driver.session() as session:
     for movie in movies:
         session.execute_write(add_movie, movie)
-        break
+
+driver.close()
