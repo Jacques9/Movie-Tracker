@@ -8,7 +8,7 @@ router = APIRouter(
 
 users_collection = Users(users_collection)
 
-@router.post('/register')
+@router.post('/register') # url /user/register
 def register(user: UsersReq):
     def hash_password(password):
         import bcrypt
