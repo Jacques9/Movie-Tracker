@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from ..schemas import UserReq, LoginReq, Users
+from ..models.users import Users, UsersReq
 from ..db_connect import users_collection
 
 router = APIRouter(
@@ -9,7 +9,7 @@ router = APIRouter(
 users_collection = Users(users_collection)
 
 @router.post('/register')
-def register(user: UserReq):
+def register(user: UsersReq):
     def hash_password(password):
         import bcrypt
         salt = bcrypt.gensalt()
