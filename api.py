@@ -97,7 +97,7 @@ class Movies:
     
 app = FastAPI()
 
-from db_connect import users_collection, movies_collection
+from api.db_connect import users_collection, movies_collection
 
 users_collection = Users(users_collection)
 movies_collection = Movies(movies_collection)
