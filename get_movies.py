@@ -39,7 +39,6 @@ def get_movies():
         for result in results:
             genre_names = [genre_map.get(genre_id) for genre_id in result['genre_ids']]
             movie_data = {
-                'id_movie': result['id'],
                 'title': result['title'],
                 'original_title': result['original_title'],
                 'release_date': result['release_date'],
@@ -59,7 +58,7 @@ def get_movies():
         if i % 40 == 0:
             time.sleep(10)
 
-    with open('Movie-Analytics/movies.json', 'a') as f:
+    with open('movies.json', 'a') as f:
         json.dump(movies, f, indent=4)
 
 if __name__ == '__main__':

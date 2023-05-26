@@ -3,7 +3,7 @@ from config import DB_NAME, CON_STR
 
 def load_db_from_json():
     import threading
-    with open('Movie-Tracker/movies.json') as f:
+    with open('movies.json') as f:
         movies = json.load(f)
 
     client = pymongo.MongoClient(CON_STR)
