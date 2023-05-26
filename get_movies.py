@@ -1,5 +1,4 @@
-import requests, time, sys, json
-sys.path.append('/home/norby/Coding/Projectz/Movie_Analytics/')
+import requests, time, json
 from config import API_KEY
 
 def setup():
