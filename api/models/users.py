@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from pymongo.collection import Collection
+from bson.objectid import ObjectId
 
 class Users:
     def __init__(self, collection: Collection) -> None:
@@ -13,7 +14,18 @@ class Users:
 
     def create_user(self, user_data: dict):
         self.collection.insert_one(user_data)
+    
+    def get_user(self, id: str):
+        return self.collection.find_one(
+            {'_id': ObjectId(id)}
+        )
+    
+    def delete_user(self, id: str):
+        result = self.collection.delete_one(
+            {'_id': ObjectId(id)}
+        )
 
+        return result.deleted_count > 0
 
 class UsersReq(BaseModel):
     username: str

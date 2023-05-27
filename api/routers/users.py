@@ -19,7 +19,10 @@ def register(user: UsersReq):
         return hashed_password.decode('utf-8')
 
     if users_collection.check_user_exists(user.email):
-        raise HTTPException(status_code=400, detail='User already exists')
+        raise HTTPException(
+            status_code=400, 
+            detail='User already exists'
+        )
 
     from datetime import datetime
     user_data = {
@@ -34,7 +37,10 @@ def register(user: UsersReq):
     try:
         users_collection.create_user(user_data)
     except Exception as e:
-        raise HTTPException(status_code=500, detail='User registration failed')
+        raise HTTPException(
+            status_code=500, 
+            detail='User registration failed'
+        )
 
     return {
         'message': 'User created'
@@ -51,9 +57,42 @@ def get_all_users():
             detail='There are no users in DB'
         )
     
-    users = [{
-        field: str(user[field]) if field == '_id' else user[field] for field in ['_id', 'username', 'email', 'type', 'created_at']
-    } 
-    for user in users]
+    users = [
+        {
+            field: str(user[field]) if field == '_id' else user[field] 
+            for field in ['_id', 'username', 'email', 'type', 'created_at']
+        } 
+        for user in users
+    ]
 
     return users
+
+@router.get('/find/{id}')
+def get_user(id: str):
+    result = users_collection.get_user(id)
+
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail='User not found'
+        )
+    
+    return {
+        '_id': str(result['_id']),
+        'username': result['username'],
+        'email': result['email'],
+        'created_at': result['created_at'],
+        'type': result['type']
+    }
+
+@router.delete('/delete/{id}')
+def delete_user(id: str):
+    if users_collection.delete_user(id):
+        return {
+            'message': 'User deleted succesfully!'
+        }
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail='User not found'
+        )
