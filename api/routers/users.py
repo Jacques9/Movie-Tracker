@@ -2,6 +2,14 @@ from fastapi import APIRouter, HTTPException
 from ..models.users import Users, UsersReq
 from ..db_connect import users_collection
 
+def hash_password(password):
+    import bcrypt
+    salt = bcrypt.gensalt()
+
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+
+    return hashed_password.decode('utf-8')
+
 router = APIRouter(
     prefix='/user'
 )
@@ -10,14 +18,6 @@ users_collection = Users(users_collection)
 
 @router.post('/register') # url /user/register
 def register(user: UsersReq):
-    def hash_password(password):
-        import bcrypt
-        salt = bcrypt.gensalt()
-
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-
-        return hashed_password.decode('utf-8')
-
     if users_collection.check_user_exists(user.email):
         raise HTTPException(
             status_code=400, 
@@ -96,3 +96,35 @@ def delete_user(id: str):
             status_code=404,
             detail='User not found'
         )
+
+@router.put('/username/{id}') # url /user/username/{id}
+def replace_username(id: str, new_username: str):
+    user = users_collection.get_user(id)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail='User not found'
+        )
+    
+    users_collection.update(id, 'username', new_username)
+
+    return {
+        'message': 'Username updated succesfully!'
+    }
+
+@router.put('/password/{id}') # url /user/password/{id}
+def replace_password(id: str, new_password: str):
+    if not users_collection.get_user(id):
+        raise HTTPException(
+            status_code=404, 
+            detail='User not found'
+        )
+    
+    hashed_pass = hash_password(new_password)
+
+    users_collection.update(id, 'password', hashed_pass)
+
+    return {
+        'message': 'Password changed succesfully'
+    }

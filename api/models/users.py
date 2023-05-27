@@ -27,6 +27,19 @@ class Users:
 
         return result.deleted_count > 0
 
+    def update(self, id: str, field: str, val: str):
+        update_query = {
+            '$set' : {
+                field: val
+            }
+        }
+
+        update_res = self.collection.update_one(
+            {'_id': ObjectId(id)}, update_query
+        )
+
+        return update_res.modified_count
+
 class UsersReq(BaseModel):
     username: str
     password: str
