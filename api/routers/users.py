@@ -39,3 +39,21 @@ def register(user: UsersReq):
     return {
         'message': 'User created'
     }
+
+@router.get('/all') # url /user/all
+def get_all_users():
+    users = users_collection.get_all_users()
+    users = list(users)
+
+    if len(users) == 0:
+        raise HTTPException(
+            status_code=404,
+            detail='There are no users in DB'
+        )
+    
+    users = [{
+        field: str(user[field]) if field == '_id' else user[field] for field in ['_id', 'username', 'email', 'type', 'created_at']
+    } 
+    for user in users]
+
+    return users
