@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routers import users
+from api.routers import users, movies
 import uvicorn
 
 app = FastAPI()
@@ -15,6 +15,10 @@ app.add_middleware(
 
 app.include_router(
     users.router
+)
+
+app.include_router(
+    movies.router
 )
 
 if __name__ == '__main__':
