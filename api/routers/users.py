@@ -67,7 +67,7 @@ def get_all_users():
 
     return users
 
-@router.get('/find/{id}')
+@router.get('/find/{id}') # url /user/find/{id}
 def get_user(id: str):
     result = users_collection.get_user(id)
 
@@ -85,7 +85,7 @@ def get_user(id: str):
         'type': result['type']
     }
 
-@router.delete('/delete/{id}')
+@router.delete('/delete/{id}') # url /user/delete/{id}
 def delete_user(id: str):
     if users_collection.delete_user(id):
         return {
