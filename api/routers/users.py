@@ -129,7 +129,7 @@ def replace_password(id: str, new_password: str):
         'message': 'Password changed succesfully'
     }
 
-@router.delete('/favorites')
+@router.delete('/favorites') # url /user/favorites/?user_id={user_id}&movie_id={movie_id}
 def delete_fav(user_id: str = Query(..., description='User id')
                , movie_id: str = Query(..., description='Movie id')):
     if not users_collection.get_user(user_id):
