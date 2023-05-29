@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from ..models.users import Users, UsersReq
 from ..db_connect import users_collection
 
@@ -128,3 +128,23 @@ def replace_password(id: str, new_password: str):
     return {
         'message': 'Password changed succesfully'
     }
+
+@router.post('/favorites')
+def delete_fav(user_id: str = Query(..., description='User id')
+               , movie_id: str = Query(..., description='Movie id')):
+    if not users_collection.get_user(user_id):
+        raise HTTPException(
+            status_code=404, 
+            detail='User not found'
+        )
+    
+    res = users_collection.delete_favorite(
+        user_id,
+        movie_id
+    )
+
+    # if res == 0:
+    #     raise HTTPException(
+    #         status_code=404, 
+    #         detail='Oh no'
+    #     )

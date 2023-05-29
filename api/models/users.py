@@ -39,6 +39,20 @@ class Users:
         )
 
         return update_res.modified_count
+    
+    def delete_favorite(self, user_id: str, movie_id: str):
+        result = self.collection.update_one(
+            {
+                '_id': ObjectId(user_id)
+            },
+            {
+                '$pull': {
+                'favourites': ObjectId(movie_id)
+                }
+            }
+        )
+
+        return result.modified_count > 0
 
 class UsersReq(BaseModel):
     username: str
