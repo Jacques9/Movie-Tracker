@@ -129,7 +129,7 @@ def replace_password(id: str, new_password: str):
         'message': 'Password changed succesfully'
     }
 
-@router.post('/favorites')
+@router.delete('/favorites')
 def delete_fav(user_id: str = Query(..., description='User id')
                , movie_id: str = Query(..., description='Movie id')):
     if not users_collection.get_user(user_id):
@@ -143,8 +143,12 @@ def delete_fav(user_id: str = Query(..., description='User id')
         movie_id
     )
 
-    # if res == 0:
-    #     raise HTTPException(
-    #         status_code=404, 
-    #         detail='Oh no'
-    #     )
+    if res == 0:
+        raise HTTPException(
+            status_code=404, 
+            detail='Oh no'
+        )
+    
+    return {
+        'message': 'Movie deleted succesfully from favorites!'
+    }
