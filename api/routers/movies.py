@@ -34,7 +34,6 @@ def get_movie(id: str):
         )
     
     return {
-        '_id': str(result['_id']),
         'title': result['title'],
         'release_date': result['release_date'],
         'popularity': result['popularity'],
