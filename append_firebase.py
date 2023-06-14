@@ -1,26 +1,30 @@
-import json, pymongo
-from config import DB_NAME, CON_STR
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+import json
+import threading
+
+def add_movie(collection_ref, movie):
+    collection_ref.add(movie)
 
 def load_db_from_json():
-    import threading
+    cred = credentials.Certificate('path/to/serviceAccountKey.json')
+    firebase_admin.initialize_app(cred)
+
+    db = firestore.client()
+
     with open('movies.json') as f:
         movies = json.load(f)
 
-    client = pymongo.MongoClient(CON_STR)
+    collection_ref = db.collection('movies')
 
-    db = client[DB_NAME]
-
-    if 'movies' not in db.list_collection_names():
-        db.create_collection('movies')
-    
     threads = []
     for movie in movies:
-        thread = threading.Thread(target=db.movies.insert_one, args=(movie,))
+        thread = threading.Thread(target=add_movie, args=(collection_ref, movie))
         thread.start()
         threads.append(thread)
 
     for thread in threads:
         thread.join()
-    
 
 load_db_from_json()
