@@ -7,3 +7,13 @@ router = APIRouter (
 )
 
 users_collection = Users(users_collection)
+
+@router.post('/register') 
+def register(user: UserReq):
+    if users_collection.check_if_exists(user.email):
+        raise HTTPException(
+            status_code=400,
+            detail='User already exists'
+        )
+    
+    
