@@ -1,16 +1,6 @@
 from pydantic import BaseModel, Field
-from firebase_admin import auth
-
-class Users:
-    def __init__(self, collection) -> None:
-        self.collection = collection
-
-    def check_if_exists(self, email: str) -> bool:
-        try:
-            auth.get_user_by_email(email)
-            return True
-        except auth.UserNotFoundError:
-            return False
+from firebase_admin import auth, firestore
+from db.connect import init_firestore
 
 class UsersReq(BaseModel):
     username: str
@@ -23,3 +13,38 @@ class LoginReq(BaseModel):
 
 class UserReq(BaseModel):
     id: str = Field(..., alias='_id')
+
+class Users:
+    def __init__(self) -> None:
+        self.db = init_firestore()
+        
+    def check_if_exists(self, email: str) -> bool:
+        try:
+            auth.get_user_by_email(email)
+            return True
+        except auth.UserNotFoundError:
+            return False
+    
+    def create_user(self, user: UsersReq, hashed_pass: str) -> bool:   
+        try:
+            auth.create_user(
+                email=user.email,
+                password=user.password,
+                display_name=user.username
+            )
+
+            from datetime import datetime
+
+            user_data = {
+                    'username': user.username,
+                    'email': user.email,
+                    'created_at': datetime.now().isoformat(),
+                    'type': 'user',
+                    'favorites': []
+            }
+
+            self.db.collection('users').add(user_data)        
+        except Exception as _:
+            return False
+
+        return True
