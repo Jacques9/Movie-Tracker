@@ -57,7 +57,7 @@ def get_movies():
         if i % 40 == 0:
             time.sleep(10)
 
-    with open('movies_out.json', 'a') as f:
+    with open('movies.json', 'a') as f:
         json.dump(movies, f, indent=4)
 
 if __name__ == '__main__':
