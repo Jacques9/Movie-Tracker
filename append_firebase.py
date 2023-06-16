@@ -6,6 +6,7 @@ def add_movie(collection_ref, movie):
     collection_ref.add(movie)
 
 def load_db_from_json():
+    # inlocuiește cu path-ul tau
     cred = credentials.Certificate('/home/norby/Coding/Projectz/Movie_Tracker/Movie-Tracker/movie-tracker-7ab60-firebase-adminsdk-y16h6-fac369a8a5.json')
     firebase_admin.initialize_app(cred)
 
