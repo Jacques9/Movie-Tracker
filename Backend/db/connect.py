@@ -10,13 +10,3 @@ def init_firestore():
     db = firestore.client()
 
     return db
-
-def create_collection(db, collection_name):
-    collection_ref = db.collection(collection_name)
-
-    return collection_ref
-
-db = init_firestore()
-
-users_collection = create_collection(db, 'users')
-movies_collection = create_collection(db, 'movies')
