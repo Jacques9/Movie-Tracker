@@ -50,7 +50,7 @@ def get_all_users():
 
     return users_data
 
-@router.get('/find/{id}')
+@router.get('/find/{id}') # url/user/find/{id}
 def get_user(id: str):
     user_doc = users.fetch_a_user(id)
 
@@ -68,4 +68,22 @@ def get_user(id: str):
         'email': user_data['email'],
         'created_at': user_data['created_at'],
         'type': user_data['type']
+    }
+
+@router.delete('/delete/{id}')
+def delete_user(id: str):
+    user_doc = users.fetch_a_user(id)
+
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404,
+            detail='User not found'
+        )
+    
+    user_data = user_doc.to_dict()
+
+    users.delete_a_user(user_data, str(user_doc.id))
+    
+    return {
+        'message': 'User deleted successfully!'
     }

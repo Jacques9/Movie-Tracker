@@ -55,3 +55,12 @@ class Users:
     
     def fetch_a_user(self, id: str):
         return self.db.collection('users').document(id).get()
+
+    def delete_a_user(self, user_data: str, id: str):
+        try: 
+            user = auth.get_user_by_email(user_data['email'])
+            auth.delete_user(user.uid)
+        except auth.UserNotFoundError as _:
+            pass
+        
+        self.db.collection('users').document(id).delete()
