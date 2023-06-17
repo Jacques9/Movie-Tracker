@@ -27,3 +27,26 @@ def register(user: UsersReq):
     return {
         'message': 'User created'
     }
+
+@router.get('/all')
+def get_all_users():
+    all_users = users.fetch_all_users()
+
+    if len(all_users) == 0:
+        raise HTTPException(
+            status_code=404,
+            detail='There are no users in DB'
+        )
+    
+    users_data = [
+        {
+            'id': user.id,
+            'username': user.get('username'),
+            'email': user.get('email'),
+            'type': user.get('type'),
+            'created_at': user.get('created_at'),
+        }
+        for user in all_users
+    ]
+
+    return users_data

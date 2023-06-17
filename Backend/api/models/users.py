@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from firebase_admin import auth, firestore
+from firebase_admin import auth
 from db.connect import init_firestore
 
 class UsersReq(BaseModel):
@@ -49,3 +49,6 @@ class Users:
             return False
 
         return True
+    
+    def fetch_all_users(self):
+        return self.db.collection('users').get()
