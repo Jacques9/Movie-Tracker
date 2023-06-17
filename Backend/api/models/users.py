@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from firebase_admin import auth
 from db.connect import init_firestore
+from fastapi import HTTPException
 
 class UsersReq(BaseModel):
     username: str
@@ -30,6 +31,7 @@ class Users:
             auth.create_user(
                 email=user.email,
                 password=user.password,
+                display_name=user.username
             )
             
 
@@ -55,10 +57,38 @@ class Users:
     def fetch_a_user(self, id: str):
         return self.db.collection('users').document(id).get()
 
+    def get_field_by(self, id: str, field: str):
+        user_doc = self.db.collection('users').document(id).get()
+
+        return user_doc.get(field)
+
+
     def update_username(self, id: str, new_usr: str):
         self.db.collection('users').document(id).update({
             'username': new_usr
         })
+
+        email = self.get_field_by(id, 'email')
+
+        user = auth.get_user_by_email(email)
+
+        auth.update_user(
+            user.uid,
+            display_name=new_usr
+        )
+
+    def update_password(self, email: str, new_pass: str):
+        try:
+            user = auth.get_user_by_email(email)
+            auth.update_user(
+                user.uid,
+                password=new_pass
+            )
+        except Exception:
+            raise HTTPException(
+                status_code=500,
+                detail='Failed to update password'
+            )
 
     def delete_a_user(self, user_data: str, id: str):
         try: 

@@ -88,7 +88,7 @@ def delete_user(id: str):
         'message': 'User deleted successfully!'
     }
 
-@router.put('/username/{id}')
+@router.put('/username/{id}') # url/username/{id}?new_username={new_username}
 def replace_username(id: str, new_username: str):
     user_doc = users.fetch_a_user(id)
 
@@ -103,3 +103,14 @@ def replace_username(id: str, new_username: str):
     return {
         'message': 'Username updated successfully!'
     }
+
+@router.put('/password/{id}') # url//user/password/{id}?new_password={new_password}
+def replace_password(id: str, new_password: str):
+    email = users.get_field_by(id, 'email')
+
+    users.update_password(email, new_password)
+
+    return {
+        'message': 'Password changed succesfully'
+    }
+
