@@ -32,6 +32,7 @@ class Users:
                 password=user.password,
                 display_name=user.username
             )
+            
 
             from datetime import datetime
 
