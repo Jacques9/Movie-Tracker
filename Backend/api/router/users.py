@@ -70,7 +70,7 @@ def get_user(id: str):
         'type': user_data['type']
     }
 
-@router.delete('/delete/{id}')
+@router.delete('/delete/{id}') # url/user/delete/{id}
 def delete_user(id: str):
     user_doc = users.fetch_a_user(id)
 
@@ -86,4 +86,20 @@ def delete_user(id: str):
     
     return {
         'message': 'User deleted successfully!'
+    }
+
+@router.put('/username/{id}')
+def replace_username(id: str, new_username: str):
+    user_doc = users.fetch_a_user(id)
+
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404,
+            detail='User not found'
+        )       
+    
+    users.update_username(id, new_username)
+
+    return {
+        'message': 'Username updated successfully!'
     }

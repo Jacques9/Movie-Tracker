@@ -30,7 +30,6 @@ class Users:
             auth.create_user(
                 email=user.email,
                 password=user.password,
-                display_name=user.username
             )
             
 
@@ -55,6 +54,11 @@ class Users:
     
     def fetch_a_user(self, id: str):
         return self.db.collection('users').document(id).get()
+
+    def update_username(self, id: str, new_usr: str):
+        self.db.collection('users').document(id).update({
+            'username': new_usr
+        })
 
     def delete_a_user(self, user_data: str, id: str):
         try: 
