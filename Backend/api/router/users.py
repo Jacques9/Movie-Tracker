@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
 from api.models.users import Users, UsersReq
-from firebase_admin import auth
 
 router = APIRouter (
     prefix='/user'
@@ -8,7 +7,7 @@ router = APIRouter (
 
 users = Users()
 
-@router.post('/register') 
+@router.post('/register')  # url/user/register
 def register(user: UsersReq):
     if users.check_if_exists(user.email):
         raise HTTPException(
@@ -28,7 +27,7 @@ def register(user: UsersReq):
         'message': 'User created'
     }
 
-@router.get('/all')
+@router.get('/all') # url/user/all
 def get_all_users():
     all_users = users.fetch_all_users()
 
@@ -50,3 +49,23 @@ def get_all_users():
     ]
 
     return users_data
+
+@router.get('/find/{id}')
+def get_user(id: str):
+    user_doc = users.fetch_a_user(id)
+
+    if not user_doc.exists:
+        raise HTTPException(
+            status_code=404,
+            detail='User not found'
+        )
+    
+    user_data = user_doc.to_dict()
+
+    return {
+        'id': str(user_doc.id),
+        'username': user_data['username'],
+        'email': user_data['email'],
+        'created_at': user_data['created_at'],
+        'type': user_data['type']
+    }

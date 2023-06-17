@@ -52,3 +52,6 @@ class Users:
     
     def fetch_all_users(self):
         return self.db.collection('users').get()
+    
+    def fetch_a_user(self, id: str):
+        return self.db.collection('users').document(id).get()
