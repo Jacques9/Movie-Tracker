@@ -16,15 +16,8 @@ def register(user: UsersReq):
             detail='User already exists'
         )
     
-
-    hashed_pass = auth.create_user(
-        email=user.email,
-        password=user.password,
-        display_name=user.username
-    ).uid
-
     try:
-        users.create_user(user, hashed_pass)
+        users.create_user(user)
     except Exception as _:
         raise HTTPException(
             status_code=500,

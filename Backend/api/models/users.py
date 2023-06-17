@@ -25,7 +25,7 @@ class Users:
         except auth.UserNotFoundError:
             return False
     
-    def create_user(self, user: UsersReq, hashed_pass: str) -> bool:   
+    def create_user(self, user: UsersReq) -> bool:   
         try:
             auth.create_user(
                 email=user.email,
