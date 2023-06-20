@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Depends
 from api.models.users import Users, UsersReq, LoginReq
 
 router = APIRouter (
@@ -29,8 +29,8 @@ def register(user: UsersReq):
 
 @router.get('/login') #url/user/login
 def login(user: LoginReq):
-    resp = users.authentificate(user)
-    return resp
+    token = users.authentificate(user)
+    return token
 
 @router.get('/all') # url/user/all
 def get_all_users():
@@ -118,5 +118,3 @@ def replace_password(id: str, new_password: str):
     return {
         'message': 'Password changed succesfully'
     }
-
-

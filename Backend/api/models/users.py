@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
 from firebase_admin import auth
-from db.connect import init_firestore
+from db.connect import get_firestore_client
 from fastapi import HTTPException
-# from config import API_KEY
+from config import API_KEY
 import requests
 
 class UsersReq(BaseModel):
@@ -19,7 +19,7 @@ class UserReq(BaseModel):
 
 class Users:
     def __init__(self) -> None:
-        self.db = init_firestore()
+        self.db = get_firestore_client()
         
     def check_if_exists(self, email: str) -> bool:
         try:
@@ -53,29 +53,43 @@ class Users:
 
         return True
     
-    # def authentificate(self, user: LoginReq):
-    #     try:
-    #         url = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}'
+    def authentificate(self, user: LoginReq):
+        try:
+            url = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}'
 
-    #         payload = {
-    #             'email': user.email,
-    #             'password': user.password,
-    #             'returnSecureToken': True
-    #         }
+            payload = {
+                'email': user.email,
+                'password': user.password,
+                'returnSecureToken': True
+            }
 
-    #         response = requests.post(
-    #             url, json=payload
-    #         )
-    #         return response
-    #         if response:
-    #             return {'message': 'Login succesful'}
-    #         else:
-    #             raise HTTPException(
-    #                 status_code=401,
-    #                 detail='Invalid email or password'
-    #             )
-    #     except Exception as _:
-    #         raise _
+            response = requests.post(
+                url, json=payload
+            )
+
+            response = response.json()
+
+            if 'idToken' in response:
+                uid = response['localId']
+                
+                user_type =  self.fetch_a_user('type', user.email)
+
+                auth.set_custom_user_claims(
+                    uid, 
+                    {
+                        'userType': user_type
+                    }
+                )
+
+
+                return {'message': 'Login successful', 'idToken': response['idToken']}
+            else:
+                raise HTTPException(
+                    status_code=401,
+                    detail='Invalid email or password'
+                )
+        except Exception as _:
+            raise _
 
     def fetch_all_users(self):
         return self.db.collection('users').get()
@@ -88,7 +102,18 @@ class Users:
 
         return user_doc.get(field)
 
+    def fetch_a_user(self, field: str, value: str):
+        users_ref = self.db.collection('users')
+        
+        query = users_ref.where('email', '==', value).limit(1)
+        user_docs = query.get()
 
+        if len(user_docs) > 0:
+            user_doc = user_docs[0]
+            return user_doc.get(field)
+        else:
+            return None
+ 
     def update_username(self, id: str, new_usr: str):
         self.db.collection('users').document(id).update({
             'username': new_usr
