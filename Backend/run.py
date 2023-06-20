@@ -17,6 +17,7 @@ app.include_router(
     users.router
 )
 
+
 if __name__ == '__main__':
     uvicorn.run(
         'run:app',

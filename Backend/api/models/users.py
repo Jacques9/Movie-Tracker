@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from firebase_admin import auth
 from db.connect import init_firestore
 from fastapi import HTTPException
+from config import API_KEY
+import requests
 
 class UsersReq(BaseModel):
     username: str
@@ -51,6 +53,30 @@ class Users:
 
         return True
     
+    def authentificate(self, user: LoginReq):
+        try:
+            url = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}'
+
+            payload = {
+                'email': user.email,
+                'password': user.password,
+                'returnSecureToken': True
+            }
+
+            response = requests.post(
+                url, json=payload
+            )
+            return response
+            if response:
+                return {'message': 'Login succesful'}
+            else:
+                raise HTTPException(
+                    status_code=401,
+                    detail='Invalid email or password'
+                )
+        except Exception as _:
+            raise _
+
     def fetch_all_users(self):
         return self.db.collection('users').get()
     

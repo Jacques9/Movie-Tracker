@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from api.models.users import Users, UsersReq
+from api.models.users import Users, UsersReq, LoginReq
 
 router = APIRouter (
     prefix='/user'
@@ -26,6 +26,11 @@ def register(user: UsersReq):
     return {
         'message': 'User created'
     }
+
+@router.get('/login') #url/user/login
+def login(user: LoginReq):
+    resp = users.authentificate(user)
+    return resp
 
 @router.get('/all') # url/user/all
 def get_all_users():
