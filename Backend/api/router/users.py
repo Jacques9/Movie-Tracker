@@ -27,7 +27,7 @@ def register(user: UsersReq):
         'message': 'User created'
     }
 
-@router.get('/login') #url/user/login
+@router.post('/login') #url/user/login
 def login(user: LoginReq):
     token = users.authentificate(user)
     return token
