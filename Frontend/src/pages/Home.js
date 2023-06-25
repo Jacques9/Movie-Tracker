@@ -5,10 +5,17 @@ import { Link } from 'react-router-dom';
 
 // Components
 import Card from '../components/Card';
-import { useFetchData } from '../hooks/useFetchData';
-
+import Manager from '../ApiManager';
+import Loading from '../components/Loading';
+var movies = [];
 const Home = () => {
-  const { documents: movies } = useFetchData('reviews');
+  const [loading, setLoading] = useState(true);
+  Manager.getAllMovies().then(
+    (m)=>{
+      movies = m.data;
+      console.log("finish")
+      setLoading(false);
+    });
 
   const [search, setSearch] = useState(null);
   const [moviesFilter, setMoviesFilter] = useState([]);
@@ -18,11 +25,14 @@ const Home = () => {
       const filter = movies.filter((movie) =>
         movie.title.toLowerCase().includes(search.toLowerCase()),
       );
-
       setMoviesFilter(filter);
     }
-  }, [search, movies]);
-
+  }, [search]);
+  if (loading){
+    return <div className='flex items-center justify-center w-full'>
+    <Loading size={'30px'} />
+  </div>;
+  }
   return (
     <section className='max-w-[1200px] w-[90%] mx-auto sectionHeight py-4 md:p-8'>
       <div className='flex flex-col items-center justify-between gap-4 pb-4 border-b-4 border-yellow-400 md:pb-8 sm:flex-row'>
@@ -50,15 +60,15 @@ const Home = () => {
         {!search &&
           movies?.map((movie) => (
             <Link
-              key={movie.id}
+              key={movie.backdrop_path}
               to={`/details/${movie.id}`}
               className='flex items-center'
             >
               <Card
-                image={movie.image}
+                image={movie.poster_path}
                 title={movie.title}
-                genre={movie.genre}
-                rating={movie.rating}
+                genre={movie.genre_names}
+                rating={movie.vote_average}
               />
             </Link>
           ))}
@@ -72,10 +82,10 @@ const Home = () => {
               className='flex items-center'
             >
               <Card
-                image={movie.image}
+                image={movie.poster_path}
                 title={movie.title}
-                genre={movie.genre}
-                rating={movie.rating}
+                genre={movie.genre_names}
+                rating={movie.vote_average}
               />
             </Link>
           ))}

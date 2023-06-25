@@ -7,10 +7,9 @@ import ResetPassword from '../components/ResetPassword';
 import Manager from "../ApiManager";
 import { useNavigate } from "react-router-dom";
 import UserProfile from '../UserProfile';
-const Login = () => {
+const Login = ({update}) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [shouldRedirect, setRedirect] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,7 +25,9 @@ const Login = () => {
     Manager.loginUser(email, password).then(result=>{
       if(result.response.ok){
         UserProfile.setName(email);
-        setRedirect(true);
+        UserProfile.setUsername(result.data);
+        update();
+        navigate("/");
       }else{
         setError(result.response.statusText +":"+ result.data);
       }
@@ -41,9 +42,6 @@ const Login = () => {
       }, 3000);
     }
   }, [error]);
-  if(shouldRedirect){
-    navigate("/");
-  }
   return (
     <section className='flex flex-col items-center justify-center sectionHeight bg-amber-200'>
       <div className='flex flex-col items-center justify-center px-16 py-8 bg-white rounded-md shadow-md max-w-[600px] w-[90%]'>

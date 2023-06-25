@@ -13,7 +13,6 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [shouldRedirect, setRedirect] = useState(false);
   const navigate = useNavigate();
   const handleRegister = (e) => {
     e.preventDefault();
@@ -33,7 +32,7 @@ const Register = () => {
     setLoading(true);
     Manager.registerNewUser(username,password,email).then(result=>{
         if(result.response.ok){
-          setRedirect(true);
+          navigate("/");
         }else{
           setError(result.response.statusText +":"+ result.data);
         }
@@ -49,9 +48,6 @@ const Register = () => {
     }
   }, [error]);
 
-  if(shouldRedirect){
-    navigate("/");
-  }
   return (
     <section className='flex flex-col items-center justify-center sectionHeight'>
       <div className='flex flex-col items-center justify-center px-16 py-8 bg-gray-100 rounded-md shadow-md max-w-[600px] w-[90%]'>

@@ -17,22 +17,20 @@ import NewReview from './pages/NewReview';
 import Loading from './components/Loading';
 import Favorites from './pages/Favorites';
 import UserProfile from './UserProfile';
+import { ReactSession } from 'react-client-session';
+ReactSession.setStoreType("localStorage");
 function App() {
-  const [user, setUser] = useState(UserProfile.getName);
-
-  if (user) {
-    return (
-      <div className='flex items-center justify-center sectionHeight'>
-        <Loading size={'60px'} />
-      </div>
-    );
+  const [user, setUser] = useState(undefined);
+  const update = ()=>{
+    setUser(UserProfile.getUsername);
   }
+  console.log(user);
   return (
     <div className='App'>
-      <Header user={user} />
+      <Header user={user} update={update} />
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/login' element={user ? <Navigate to='/' /> : <Login />} />
+        <Route path='/login' element={user ? <Navigate to='/' /> : <Login update={update}/>} />
         <Route
           path='/register'
           element={user ? <Navigate to='/' /> : <Register />}

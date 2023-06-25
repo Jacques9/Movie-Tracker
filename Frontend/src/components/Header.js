@@ -14,11 +14,10 @@ import {
 // Icons
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { RiUserFill } from 'react-icons/ri';
-import { useAuth } from '../hooks/useAuth';
+import UserProfile from '../UserProfile';
 
-const Header = ({ user }) => {
-  const { signOutUser } = useAuth();
-
+const Header = ({ user }, {update}) => {
+  const signOutUser = () => {UserProfile.setUsername(undefined); update();};
   return (
     <header className='shadow-md bg-gray-50 '>
       <Root className='flex justify-between items-center max-w-[1200px] w-[90%] mx-auto py-4 '>
@@ -26,8 +25,8 @@ const Header = ({ user }) => {
           to='/'
           className='text-2xl font-bold transition-all duration-300 hover:tracking-wider'
         >
-          movie
-          <span className='text-yellow-400'>Reviews</span>
+          Movie
+          <span className='text-yellow-400'>Tracker</span>
         </Link>
         <List className='relative top-[4px] '>
           {!user && (
