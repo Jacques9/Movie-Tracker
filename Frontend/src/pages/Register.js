@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Loading from '../components/Loading';
 import Manager from '../ApiManager';
-import { redirect } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {

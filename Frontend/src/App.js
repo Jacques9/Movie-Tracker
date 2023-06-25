@@ -2,8 +2,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Hooks
-import { useEffect, useState } from 'react';
-import { useAuth } from './hooks/useAuth';
+import { useState } from 'react';
 
 // Components
 import Header from './components/Header';
@@ -17,19 +16,11 @@ import Profile from './pages/Profile';
 import NewReview from './pages/NewReview';
 import Loading from './components/Loading';
 import Favorites from './pages/Favorites';
-
+import UserProfile from './UserProfile';
 function App() {
-  const [user, setUser] = useState(undefined);
+  const [user, setUser] = useState(UserProfile.getName);
 
-  const { auth, onAuthStateChanged } = useAuth();
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
-  }, [auth, onAuthStateChanged]);
-
-  if (user === undefined) {
+  if (user) {
     return (
       <div className='flex items-center justify-center sectionHeight'>
         <Loading size={'60px'} />

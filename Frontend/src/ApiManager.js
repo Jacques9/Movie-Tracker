@@ -4,7 +4,6 @@ const baseUrl = "http://localhost:8000/";
 const registerUrl = baseUrl + "user/register";
 const loginUrl = baseUrl + "user/login";
 
-
 async function registerNewUser(username,password,email){
     const requestOptions = {
         method: 'POST',
