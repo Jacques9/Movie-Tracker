@@ -9,17 +9,20 @@ import Manager from '../ApiManager';
 import Loading from '../components/Loading';
 var movies = [];
 const Home = () => {
-  const [loading, setLoading] = useState(true);
-  Manager.getAllMovies().then(
-    (m)=>{
-      movies = m.data;
-      console.log("finish")
-      setLoading(false);
-    });
-
+  const [loading, setLoading] = useState(movies===[]);
   const [search, setSearch] = useState(null);
   const [moviesFilter, setMoviesFilter] = useState([]);
-
+  if(movies===[] || movies.length === 0)
+  {
+    console.log("call");
+    Manager.getAllMovies().then(
+    (m)=>{
+      movies = m.data;
+      setSearch("");
+      setLoading(false);
+    });
+  }
+  
   useEffect(() => {
     if (search) {
       const filter = movies.filter((movie) =>
@@ -60,7 +63,7 @@ const Home = () => {
         {!search &&
           movies?.map((movie) => (
             <Link
-              key={movie.backdrop_path}
+              key={movie.id}
               to={`/details/${movie.id}`}
               className='flex items-center'
             >

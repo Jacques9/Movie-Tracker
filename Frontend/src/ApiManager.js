@@ -33,10 +33,10 @@ async function getAllMovies(){
     };
     const response = await fetch(getAllMoviesUrl, requestOptions);
     const data = await response.json();
-    console.log("get");
     data.forEach(element => {
         //https://image.tmdb.org/t/p/original/[poster_path]
-        element.poster_path = "https://image.tmdb.org/t/p/original/" + element.poster_path; 
+        element.id = element.backdrop_path;
+        element.poster_path = "https://image.tmdb.org/t/p/original" + element.poster_path; 
     });
     return {response: response, data: data};
 }

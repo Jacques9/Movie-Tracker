@@ -14,7 +14,6 @@ import Register from './pages/Register';
 import Details from './pages/Details';
 import Profile from './pages/Profile';
 import NewReview from './pages/NewReview';
-import Loading from './components/Loading';
 import Favorites from './pages/Favorites';
 import UserProfile from './UserProfile';
 import { ReactSession } from 'react-client-session';
@@ -24,7 +23,6 @@ function App() {
   const update = ()=>{
     setUser(UserProfile.getUsername);
   }
-  console.log(user);
   return (
     <div className='App'>
       <Header user={user} update={update} />
