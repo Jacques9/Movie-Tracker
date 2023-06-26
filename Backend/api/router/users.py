@@ -142,3 +142,15 @@ def add_to_watching(user_id: str, movie_id: str):
 @router.delete('/watching/{user_id}/{movie_id}')
 def remove_movie_from_watching(user_id: str, movie_id: str):
     return users.remove_movie_from_watching(user_id=user_id, movie_id=movie_id)
+
+@router.get('/favorites/{user_id}')
+def get_favorites(user_id: str):
+    return users.fetch_favorites_by_id(user_id=user_id)
+
+@router.get('/watching/{user_id}')
+def get_favorites(user_id: str):
+    return users.fetch_watching_by_id(user_id=user_id)
+
+@router.get('/watched/{user_id}')
+def get_favorites(user_id: str):
+    return users.fetch_watched_by_id(user_id=user_id)

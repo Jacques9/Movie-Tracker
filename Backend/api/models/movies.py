@@ -28,3 +28,19 @@ class Movies:
             return movie_doc.to_dict()
         else:
             raise HTTPException(status_code=404, detail='Movie not found')
+    
+    def delete_movie_by_id(self, id: str):
+        try:
+            movie_ref = self.db.collection('movies').document(id)
+
+            movie_doc = movie_ref.get()
+            if not movie_doc.exists:
+                raise HTTPException(status_code=404, detail='Movie not found')
+
+            movie_ref.delete()
+
+            return {'message': 'Movie deleted successfully'}
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to delete movie')
