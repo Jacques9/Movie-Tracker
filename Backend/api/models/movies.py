@@ -13,9 +13,18 @@ class Movies:
         self.db = get_firestore_client()
 
     def fetch_all_movies(self):
-        # reminder to change limit
-        # maybe maybe lru caching the movies later
-        movies_ref = self.db.collection('movies').limit(50) 
-        all_movies = [doc.to_dict() for doc in movies_ref.stream()]
+        movies_ref = self.db.collection('movies').limit(50)
+        all_movies = []
+
+        for doc in movies_ref.stream():
+            movie_data = doc.to_dict()
+            movie_data['id'] = doc.id
+            all_movies.append(movie_data)
         return all_movies
     
+    def fetch_movie_by_id(self, movie_id: str):
+        movie_doc = self.db.collection('movies').document(movie_id).get()
+        if movie_doc.exists:
+            return movie_doc.to_dict()
+        else:
+            raise HTTPException(status_code=404, detail='Movie not found')
