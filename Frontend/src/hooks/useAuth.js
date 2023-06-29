@@ -30,26 +30,6 @@ export const useAuth = () => {
     url: 'https://moviereviews-yago.vercel.app/',
   };
 
-  // Function to register and login new users
-  const registerUser = async (email, password, username) => {
-    setLoading(true);
-
-    try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-
-      await updateProfile(user, { displayName: username });
-
-      setLoading(false);
-    } catch (e) {
-      setError(e.message);
-      setLoading(false);
-    }
-  };
-
   // Function to login users
   const signInUser = async (email, password) => {
     setLoading(true);
@@ -68,32 +48,9 @@ export const useAuth = () => {
     signOut(auth);
   };
 
-  // Function to send reset password email for users
-  const resetPassword = async (email) => {
-    setLoading(true);
-
-    try {
-      await sendPasswordResetEmail(auth, email, actionCodeSettings);
-      setMessage(
-        'E-mail de recuperação enviado com sucesso, por favor verifique sua caixa de entrada ou spam.',
-      );
-      setLoading(false);
-    } catch (e) {
-      setError(e.message);
-      console.log(e.message);
-      setLoading(false);
-    }
-  };
-
   return {
-    auth,
-    registerUser,
     signInUser,
     signOutUser,
-    resetPassword,
-    message,
-    error,
-    loading,
     onAuthStateChanged,
   };
 };
