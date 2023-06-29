@@ -20,15 +20,15 @@ import { ReactSession } from 'react-client-session';
 ReactSession.setStoreType("localStorage");
 function App() {
   const [user, setUser] = useState(undefined);
-  const update = ()=>{
-    setUser(UserProfile.getUsername);
+  const callback = ()=>{
+    setUser(UserProfile.getId);
   }
   return (
     <div className='App'>
-      <Header user={user} update={update} />
+      <Header user={user} update={callback} />
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/login' element={user ? <Navigate to='/' /> : <Login update={update}/>} />
+        <Route path='/login' element={user ? <Navigate to='/' /> : <Login update={callback}/>} />
         <Route
           path='/register'
           element={user ? <Navigate to='/' /> : <Register />}

@@ -16,8 +16,8 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { RiUserFill } from 'react-icons/ri';
 import UserProfile from '../UserProfile';
 
-const Header = ({ user }, {update}) => {
-  const signOutUser = () => {UserProfile.setUsername(undefined); update();};
+const Header = ({ user , update}) => {
+  const signOutUser = () => {UserProfile.Reset(); update();};
   return (
     <header className='shadow-md bg-gray-50 '>
       <Root className='flex justify-between items-center max-w-[1200px] w-[90%] mx-auto py-4 '>

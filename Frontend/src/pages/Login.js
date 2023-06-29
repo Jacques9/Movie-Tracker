@@ -26,6 +26,7 @@ const Login = ({update}) => {
       if(result.response.ok){
         UserProfile.setName(email);
         UserProfile.setUsername(result.data.token);
+        UserProfile.setId(result.data.id);
         update();
         navigate("/");
       }else{
