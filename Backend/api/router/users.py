@@ -118,3 +118,39 @@ def replace_password(id: str, new_password: str):
     return {
         'message': 'Password changed succesfully'
     }
+
+@router.post('/favorites/{user_id}/{movie_id}')
+def add_movie_to_fav(user_id: str, movie_id: str):
+    return users.add_movie_to_favorites(user_id=user_id, movie_id=movie_id)
+
+@router.delete('/favorites/{user_id}/{movie_id}')
+def remove_movie_from_fav(user_id: str, movie_id: str):
+    return users.remove_movie_from_fav(user_id=user_id, movie_id=movie_id)
+
+@router.post('/watched/{user_id}/{movie_id}')
+def add_to_watched(user_id: str, movie_id: str):
+    return users.add_to_watched(user_id=user_id, movie_id=movie_id)
+
+@router.delete('/watched/{user_id}/{movie_id}')
+def delete_movie_from_watched(user_id: str, movie_id: str):
+    return users.delete_from_watched(user_id=user_id, movie_id=movie_id)
+
+@router.post('/watching/{user_id}/{movie_id}')
+def add_to_watching(user_id: str, movie_id: str):
+    return users.add_to_watching(user_id=user_id, movie_id=movie_id)
+
+@router.delete('/watching/{user_id}/{movie_id}')
+def remove_movie_from_watching(user_id: str, movie_id: str):
+    return users.remove_movie_from_watching(user_id=user_id, movie_id=movie_id)
+
+@router.get('/favorites/{user_id}')
+def get_favorites(user_id: str):
+    return users.fetch_favorites_by_id(user_id=user_id)
+
+@router.get('/watching/{user_id}')
+def get_favorites(user_id: str):
+    return users.fetch_watching_by_id(user_id=user_id)
+
+@router.get('/watched/{user_id}')
+def get_favorites(user_id: str):
+    return users.fetch_watched_by_id(user_id=user_id)

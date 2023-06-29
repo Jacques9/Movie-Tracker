@@ -44,7 +44,9 @@ class Users:
                     'email': user.email,
                     'created_at': datetime.now().isoformat(),
                     'type': 'user',
-                    'favorites': []
+                    'favorites': [],
+                    'watched': [],
+                    'watching': []
             }
 
             self.db.collection('users').add(user_data)        
@@ -149,3 +151,226 @@ class Users:
             pass
         
         self.db.collection('users').document(id).delete()
+
+    def add_movie_to_favorites(self, user_id: str, movie_id: str):
+        try:
+            user_ref = self.db.collection('users').document(user_id)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+            favorites = user_data.get('favorites', [])
+
+            if movie_id in favorites:
+                raise HTTPException(status_code=400, detail='Movie already in favorites')
+
+            favorites.append(movie_id)
+
+            user_ref.update({'favorites': favorites})
+
+            return {'message': 'Movie added to favorites'}
+        
+        except HTTPException:
+            raise  
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to add movie to favorites')
+        
+    def remove_movie_from_fav(self, user_id: str, movie_id: str):
+        try:
+            user_ref = self.db.collection('users').document(user_id)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+            favorites = user_data.get('favorites', [])
+
+            if movie_id not in favorites:
+                raise HTTPException(status_code=400, detail='Movie not found in favorites')
+
+            favorites.remove(movie_id)
+
+            user_ref.update({'favorites': favorites})
+
+            return {'message': 'Movie removed from favorites'}
+        except HTTPException:
+            raise  
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to remove movie from favorites')
+        
+    def add_to_watched(self, user_id: str, movie_id: str):
+        try:
+            user_ref = self.db.collection('users').document(user_id)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+
+            favorites = user_data.get('favorites', [])
+            if movie_id in favorites:
+                favorites.remove(movie_id)
+                user_ref.update({'favorites': favorites})
+
+            watched = user_data.get('watched', [])
+            if movie_id not in watched:
+                watched.append(movie_id)
+                user_ref.update({'watched': watched})
+
+            return {'message': 'Movie added to watched list'}
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to add movie to watched list')
+        
+    def delete_from_watched(self, user_id: str, movie_id: str):
+        try:
+            user_ref = self.db.collection('users').document(user_id)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+
+            watched = user_data.get('watched', [])
+            if movie_id in watched:
+                watched.remove(movie_id)
+                user_ref.update({'watched': watched})
+
+            return {'message': 'Movie removed from watched list'}
+        except HTTPException:
+            raise  
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to remove movie from watched list')
+        
+    def add_to_watching(self, user_id: str, movie_id: str):
+        try:
+            user_ref = self.db.collection('users').document(user_id)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+
+            favorites = user_data.get('favorites', [])
+            if movie_id in favorites:
+                favorites.remove(movie_id)
+                user_ref.update({'favorites': favorites})
+
+            watched = user_data.get('watched', [])
+            if movie_id in watched:
+                raise HTTPException(status_code=400, detail='Movie already in watched list')
+
+            watching = user_data.get('watching', [])
+            if movie_id in watching:
+                raise HTTPException(status_code=400, detail='Movie already in watching list')
+
+            watching.append(movie_id)
+            user_ref.update({'watching': watching})
+
+            return {'message': 'Movie added to watching list'}
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to add movie to watching list')
+        
+    def remove_movie_from_watching(self, user_id: str, movie_id: str):
+        try:
+            user_ref = self.db.collection('users').document(user_id)
+
+            user_doc = user_ref.get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+
+            watching = user_data.get('watching', [])
+            if movie_id in watching:
+                watching.remove(movie_id)
+                user_ref.update({'watching': watching})
+
+            return {'message': 'Movie removed from watching list'}
+        except HTTPException:
+            raise  
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to remove movie from watching list')
+        
+    def fetch_favorites_by_id(self, user_id: str):
+        try:
+            user_doc = self.db.collection('users').document(user_id).get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+            favorites = user_data.get('favorites', [])
+
+            movies = []
+            for movie_id in favorites:
+                movie = self.fetch_movie_by_id(movie_id)
+                movies.append(movie)
+
+            return movies
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to fetch favorites')
+    
+    def fetch_watching_by_id(self, user_id: str):
+        try:
+            user_doc = self.db.collection('users').document(user_id).get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+            watching = user_data.get('watching', [])
+
+            movies = []
+            for movie_id in watching:
+                movie = self.fetch_movie_by_id(movie_id)
+                movies.append(movie)
+
+            return movies
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to fetch watching list')
+    
+    def fetch_watched_by_id(self, user_id: str):
+        try:
+            user_doc = self.db.collection('users').document(user_id).get()
+            if not user_doc.exists:
+                raise HTTPException(status_code=404, detail='User not found')
+
+            user_data = user_doc.to_dict()
+            watched = user_data.get('watched', [])
+
+            movies = []
+            for movie_id in watched:
+                movie = self.fetch_movie_by_id(movie_id)
+                movies.append(movie)
+
+            return movies
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to fetch watched list')
+    
+    def fetch_movie_by_id(self, movie_id: str):
+        try:
+            movie_doc = self.db.collection('movies').document(movie_id).get()
+            if movie_doc.exists:
+                movie_data = movie_doc.to_dict()
+                movie_data['id'] = movie_doc.id
+                return movie_data
+            else:
+                raise HTTPException(status_code=404, detail='Movie not found')
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='Failed to fetch movie')
