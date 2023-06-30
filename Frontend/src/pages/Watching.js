@@ -5,18 +5,20 @@ import AddFavorite from '../components/AddFavorite';
 import Card from '../components/Card';
 import Manager from '../ApiManager';
 import Loading from '../components/Loading';
-var favorites = [];
-const Favorites = ({ user }) => {
-  const [loading, setLoading] = useState(favorites===[]);
+import AddWatched from '../components/AddWatched';
+import AddWatching from '../components/AddWatching';
+var watched = [];
+const Watching = ({ user }) => {
+  const [loading, setLoading] = useState(watched===[]);
   const [error, setError] = useState(null);
   const [refresh, setRefresh] = useState(true);
   if(refresh)
   {
     setLoading(true);
-    Manager.getFavMovies(user).then(
+    Manager.getWatchingMovies(user).then(
     (m)=>{
       if(m.response.ok){
-        favorites = m.data;
+        watched = m.data;
       }else{
         setError(m.data);
       }
@@ -34,13 +36,13 @@ const Favorites = ({ user }) => {
     <section className='flex flex-col items-center justify-start gap-10 py-16 sectionHeight lg:py-32'>
       <h1 className='mb-2 text-3xl font-bold sm:text-4xl xl:text-5xl'>
         <span className='text-yellow-400 border-b-4 border-black '>
-          Favorites
+          Watching
         </span>
       </h1>
       <div className='grid items-start grid-flow-row grid-cols-1 gap-8 py-8 justify-items-center sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-        {favorites &&
-          favorites.length > 0 &&
-          favorites?.map((movie) => (
+        {watched &&
+          watched.length > 0 &&
+          watched?.map((movie) => (
             <div className='relative ' key={movie.id}>
               <Link to={`/details/${movie.id}`} className='flex items-center '>
               <Card
@@ -51,17 +53,19 @@ const Favorites = ({ user }) => {
               />
               </Link>
               <div className='absolute top-0 left-0 p-2 bg-[rgba(0,0,0,0.7)] cursor-pointer'>
-                <AddFavorite movieId={movie.id} user={user} callback={()=>setRefresh(true)} favorite={true} />
+                <AddFavorite movieId={movie.id} user={user} callback={()=>setRefresh(true)} />
+                <AddWatched movieId={movie.id} user={user} callback={()=>setRefresh(true)} />
+                <AddWatching movieId={movie.id} user={user} callback={()=>setRefresh(true)} watching={true} />
               </div>
             </div>
           ))}
       </div>
 
-      {favorites && favorites.length === 0 && (
+      {watched && watched.length === 0 && (
         <p className='italic text-gray-400'>No favorites added</p>
       )}
     </section>
   );
 };
 
-export default Favorites;
+export default Watching;

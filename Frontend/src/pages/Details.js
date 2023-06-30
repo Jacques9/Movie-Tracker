@@ -10,6 +10,8 @@ import AddFavorite from '../components/AddFavorite';
 import Manager from '../ApiManager';
 import Loading from '../components/Loading';
 import { useNavigate } from "react-router-dom";
+import AddWatched from '../components/AddWatched';
+import AddWatching from '../components/AddWatching';
 
 
 const Details = ({ user }) => {
@@ -69,7 +71,10 @@ const Details = ({ user }) => {
           {user && (
             <div className='absolute top-0 left-0 p-2 bg-[rgba(0,0,0,0.7)]  cursor-pointer'>
               <AddFavorite movieId={id} user={user} />
+              <AddWatched movieId={id} user={user} />
+              <AddWatching movieId={id} user={user} />
             </div>
+            
           )}
 
           <div className='flex flex-col gap-4'>

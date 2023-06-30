@@ -16,7 +16,9 @@ import Profile from './pages/Profile';
 import NewReview from './pages/NewReview';
 import Favorites from './pages/Favorites';
 import UserProfile from './UserProfile';
+import Watched from './pages/Watched';
 import { ReactSession } from 'react-client-session';
+import Watching from './pages/Watching';
 ReactSession.setStoreType("localStorage");
 function App() {
   const [user, setUser] = useState(undefined);
@@ -41,6 +43,14 @@ function App() {
         <Route
           path='/favorites'
           element={!user ? <Navigate to='/' /> : <Favorites user={user} />}
+        />
+        <Route
+          path='/watched'
+          element={!user ? <Navigate to='/' /> : <Watched user={user} />}
+        />
+        <Route
+          path='/watching'
+          element={!user ? <Navigate to='/' /> : <Watching user={user} />}
         />
         <Route
           path='/add-review'

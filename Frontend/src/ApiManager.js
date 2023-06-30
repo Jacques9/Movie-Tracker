@@ -8,6 +8,10 @@ const getAllMoviesUrl = baseUrl + "movie/all";
 const getMovieByIdUrl = (id) => {return baseUrl + "movie/" + id;}
 const getFavMoviesUrl = (id) => {return baseUrl + "user/favorites/" + id;}
 const modifyFavMoviesUrl = (id,movie) => {return baseUrl + "user/favorites/" + id + "/" + movie;}
+const getWatchedMoviesUrl = (id) => {return baseUrl + "user/watched/" + id;}
+const modifyWatchedMoviesUrl = (id,movie) => {return baseUrl + "user/watched/" + id + "/" + movie;}
+const getWatchingMoviesUrl = (id) => {return baseUrl + "user/watching/" + id;}
+const modifyWatchingMoviesUrl = (id,movie) => {return baseUrl + "user/watching/" + id + "/" + movie;}
 
 async function safeFetch(url,options){
     try{
@@ -75,8 +79,38 @@ async function getFavMovies(user){
     }
     return {response: response, data: data};
 }
-
-
+async function getWatchedMovies(user){
+    const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(getWatchedMoviesUrl(user), requestOptions);
+    const data = await response.json();
+    if(response.ok){
+        data.forEach(element => {
+            //https://image.tmdb.org/t/p/original/[poster_path]
+            //element.id = element.backdrop_path;
+            element.poster_path = imagesUrl + element.poster_path; 
+        });
+    }
+    return {response: response, data: data};
+}
+async function getWatchingMovies(user){
+    const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(getWatchingMoviesUrl(user), requestOptions);
+    const data = await response.json();
+    if(response.ok){
+        data.forEach(element => {
+            //https://image.tmdb.org/t/p/original/[poster_path]
+            //element.id = element.backdrop_path;
+            element.poster_path = imagesUrl + element.poster_path; 
+        });
+    }
+    return {response: response, data: data};
+}
 async function getMovieById(id){
     const requestOptions = {
         method: 'GET',
@@ -108,7 +142,42 @@ async function removeMovieFromFav(user,movie){
     const data = await response.json();
     return {response: response, data: data};
 }
-
+async function addMovieToWatched(user,movie){
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(modifyWatchedMoviesUrl(user,movie), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+async function removeMovieFromWatched(user,movie){
+    const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(modifyWatchedMoviesUrl(user,movie), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+async function addMovieToWatching(user,movie){
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(modifyWatchingMoviesUrl(user,movie), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+async function removeMovieFromWatching(user,movie){
+    const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(modifyWatchingMoviesUrl(user,movie), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
 const Manager = {
     registerNewUser, 
     loginUser,
@@ -117,5 +186,11 @@ const Manager = {
     addMovieToFav,
     removeMovieFromFav,
     getFavMovies,
+    getWatchedMovies,
+    getWatchingMovies,
+    addMovieToWatched,
+    removeMovieFromWatched,
+    addMovieToWatching,
+    removeMovieFromWatching,
 }
 export default Manager;

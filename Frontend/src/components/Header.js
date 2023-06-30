@@ -95,6 +95,22 @@ const Header = ({ user , update}) => {
                   </Link>
                 </RadixLink>
                 <RadixLink>
+                  <Link
+                    to='/watched'
+                    className='px-4 text-yellow-400 transition-all duration-200 hover:text-black hover:font-bold hover:border-l-4 hover:border-l-yellow-400'
+                  >
+                    Watched
+                  </Link>
+                </RadixLink>
+                <RadixLink>
+                  <Link
+                    to='/watching'
+                    className='px-4 text-yellow-400 transition-all duration-200 hover:text-black hover:font-bold hover:border-l-4 hover:border-l-yellow-400'
+                  >
+                    Watching
+                  </Link>
+                </RadixLink>
+                <RadixLink>
                   <span
                     onClick={signOutUser}
                     className='px-4 text-yellow-400 transition-all duration-200 cursor-pointer hover:text-black hover:font-bold hover:border-l-4 hover:border-l-yellow-400'
