@@ -25,11 +25,12 @@ const Login = ({update}) => {
     Manager.loginUser(email, password).then(result=>{
       if(result.response.ok){
         UserProfile.setName(email);
-        UserProfile.setUsername(result.data);
+        UserProfile.setUsername(result.data.token);
+        UserProfile.setId(result.data.id);
         update();
         navigate("/");
       }else{
-        setError(result.response.statusText +":"+ result.data);
+        setError(result.response.statusText +":"+ result.data.error);
       }
       setLoading(false);
     });

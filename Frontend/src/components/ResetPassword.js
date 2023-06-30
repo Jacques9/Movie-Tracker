@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { useAuth } from '../hooks/useAuth';
 
 const ResetPassword = ({ userEmail }) => {
   const [email, setEmail] = useState(userEmail);
-  const { resetPassword } = useAuth();
 
   const handleReset = () => {
-    resetPassword(email);
+    //resetPassword(email);
     return;
   };
 

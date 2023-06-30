@@ -14,7 +14,7 @@ const Card = ({ image, title, genre, rating }) => {
     for (let i = 1; i < size / 2; i++) {
       arr.push(i);
     }
-    if(Number.isInteger(size))arr.push(0.5);
+    if(!Number.isInteger(size))arr.push(0.5);
     while(arr.length<5)arr.push(-arr.length);
     return arr;
   };
