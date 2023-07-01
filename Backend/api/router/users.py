@@ -29,8 +29,8 @@ def register(user: UsersReq):
 
 @router.post('/login') #url/user/login
 def login(user: LoginReq):
-    token = users.authentificate(user)
-    return token
+    data = users.authentificate(user)
+    return data
 
 @router.get('/all') # url/user/all
 def get_all_users():

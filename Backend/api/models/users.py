@@ -44,6 +44,7 @@ class Users:
                     'email': user.email,
                     'created_at': datetime.now().isoformat(),
                     'type': 'user',
+                    'profile_pic': '',
                     'favorites': [],
                     'watched': [],
                     'watching': []
@@ -65,26 +66,33 @@ class Users:
                 'returnSecureToken': True
             }
 
-            response = requests.post(
-                url, json=payload
-            )
-
+            response = requests.post(url, json=payload)
             response = response.json()
 
             if 'idToken' in response:
                 uid = response['localId']
                 
-                user_type =  self.fetch_a_user('type', user.email)
+                users_collection = self.db.collection('users')
+                user_query = users_collection.where('email', '==', user.email).limit(1)
+                user_docs = user_query.get()
 
-                auth.set_custom_user_claims(
-                    uid, 
-                    {
-                        'userType': user_type
-                    }
-                )
+                if len(user_docs) > 0:
+                    user_doc = user_docs[0]
+                    user_type = user_doc.get('type')
 
+                    auth.set_custom_user_claims(
+                        uid,
+                        {
+                            'userType': user_type
+                        }
+                    )
 
-                return {'message': 'Login successful', 'idToken': response['idToken']}
+                    return {'message': 'Login successful', 'idToken': response['idToken'], 'user_id': uid}
+                else:
+                    raise HTTPException(
+                        status_code=404,
+                        detail='User not found'
+                    )
             else:
                 raise HTTPException(
                     status_code=401,
