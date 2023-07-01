@@ -45,6 +45,7 @@ class Users:
                     'created_at': datetime.now().isoformat(),
                     'type': 'user',
                     'profile_pic': '',
+                    'user_reviews': [],
                     'favorites': [],
                     'watched': [],
                     'watching': []
@@ -382,3 +383,31 @@ class Users:
             raise
         except Exception as e:
             raise HTTPException(status_code=500, detail='Failed to fetch movie')
+        
+    def fetch_user_reviews(self, user_id: str):
+        user_ref = self.db.collection('users').document(user_id)
+        user_data = user_ref.get().to_dict()
+        user_reviews = user_data.get('user_reviews', [])
+
+        review_data_list = []
+        for review_ref in user_reviews:
+            review_reference = review_ref.path
+
+            split_parts = review_reference.split("/reviews/")
+            movie_id = split_parts[0].split("/")[1]
+            review_id = split_parts[1]
+
+            movie_doc_ref = self.db.collection('movies').document(movie_id)
+            movie_doc = movie_doc_ref.get()
+
+            if movie_doc.exists:
+                movie_data = movie_doc.to_dict()
+                reviews = movie_data.get('reviews', [])
+
+                for review in reviews:
+                    if review.get('review_id') == review_id:
+                        review_data = review.get('review_data')
+                        review_data_list.append(review_data)
+                        break
+
+        return review_data_list

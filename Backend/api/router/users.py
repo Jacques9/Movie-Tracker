@@ -119,6 +119,7 @@ def replace_password(id: str, new_password: str):
         'message': 'Password changed succesfully'
     }
 
+
 @router.post('/favorites/{user_id}/{movie_id}')
 def add_movie_to_fav(user_id: str, movie_id: str):
     return users.add_movie_to_favorites(user_id=user_id, movie_id=movie_id)
@@ -154,3 +155,7 @@ def get_favorites(user_id: str):
 @router.get('/watched/{user_id}')
 def get_favorites(user_id: str):
     return users.fetch_watched_by_id(user_id=user_id)
+
+@router.get('/reviews')
+def get_reviews(user_id: str):
+    return users.fetch_user_reviews(user_id)
