@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from firebase_admin import auth
+from firebase_admin import auth, firestore
 from db.connect import get_firestore_client
 from fastapi import HTTPException
 import firebase_admin
@@ -44,3 +44,21 @@ class Movies:
             raise
         except Exception as e:
             raise HTTPException(status_code=500, detail='Failed to delete movie')
+    
+    def add_review(self, user_id: str, movie_id: str, text: str, stars: int):
+        review = {
+            'user_id': user_id,
+            'text': text,
+            'stars': stars
+        }
+
+        movie_data = self.fetch_movie_by_id(movie_id)
+        if 'reviews' not in movie_data:
+            movie_data['reviews'] = []
+
+        movie_data['reviews'].append(review)
+
+        movie_ref = self.db.collection('movies').document(movie_id)
+        movie_ref.set(movie_data, merge=True)
+
+        return {'message': 'Review added successfully.'}

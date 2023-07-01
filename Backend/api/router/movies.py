@@ -18,3 +18,7 @@ def get_movie_by_id(id: str):
 @router.delete('/{id}')
 def remove_movie_by_id(id: str):
     return movies.delete_movie_by_id(id)
+
+@router.post('/review')
+def add_movie_review(user_id: str, movie_id: str, text: str, stars: int):
+    movies.add_review(user_id, movie_id, text, stars)
