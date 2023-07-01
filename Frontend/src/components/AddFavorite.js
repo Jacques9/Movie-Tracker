@@ -1,49 +1,67 @@
 import { useEffect, useState } from 'react';
 
-import { database } from '../firebase/config';
-import { deleteDoc, doc, setDoc, Timestamp } from 'firebase/firestore';
-
 import { TbHeartPlus, TbHeartMinus } from 'react-icons/tb';
-import { useFetchData } from '../hooks/useFetchData';
-
-const AddFavorite = ({ movieId, user }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  const { documents: favorites } = useFetchData(`users/${user?.uid}/favorites`);
-  const { documents: movies } = useFetchData(`reviews`);
-
+import Manager from '../ApiManager';
+import Loading from '../components/Loading';
+const AddFavorite = ({ movieId, user, callback, favorite }) => {
+  const [isFavorite, setIsFavorite] = useState(favorite);
+  const [error,setError] = useState(undefined);
+  const [loading,setLoading] = useState(false);
   const addFavorite = async () => {
-    try {
-      const movieData = movies.filter((movie) => movie.id === movieId);
-      const data = { ...movieData[0], createdAt: Timestamp.now() };
-      await setDoc(
-        doc(database, `users/${user?.uid}/favorites`, movieId),
-        data,
-      );
-    } catch (err) {
-      console.log(err.message);
-    }
+    setLoading(true);
+    Manager.addMovieToFav(user,movieId).then((result)=>{
+      if(result.response.ok){
+        setError(undefined);
+        setIsFavorite(true);
+        if(callback)callback();
+      }else{
+        setError(result.response.statusText);
+      }
+      setLoading(false)
+    });
   };
 
   const removeFavorite = async () => {
-    try {
-      await deleteDoc(doc(database, `users/${user?.uid}/favorites`, movieId));
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
-  useEffect(() => {
-    if (favorites) {
-      const verify = favorites.filter((favorite) => favorite.id === movieId);
-      if (verify.length > 0) {
-        setIsFavorite(true);
-      } else {
+    setLoading(true);
+    Manager.removeMovieFromFav(user,movieId).then((result)=>{
+      if(result.response.ok){
+        setError(undefined);
         setIsFavorite(false);
+        if(callback)callback();
+      }else{
+        setError(result.response.statusText);
       }
-    }
-  }, [favorites, movieId]);
+      setLoading(false)
+    });
+  };
+  if(isFavorite === undefined && loading===false){
+    setLoading(true);
+    Manager.getFavMovies(user).then((result)=>{
+      if(result.response.ok){
+        let ok = false;
+        result.data?.forEach(element => {
+          if(element.id===movieId){
+            ok=true;
+          }
+        });
+        setIsFavorite(ok);
+      }else{
+        setIsFavorite("error");
+        setError(result.response.statusText);
+      }
+      setLoading(false);
+    });
+  }
 
+  if(error){
+    return <p>{error}</p>;
+  }
+  if (loading){
+    return <div className='flex items-center justify-center w-full'>
+    <Loading size={'20px'} />
+  </div>;
+  }
+  
   return (
     <>
       {isFavorite ? (

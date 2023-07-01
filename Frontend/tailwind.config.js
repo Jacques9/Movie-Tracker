@@ -9,7 +9,7 @@ module.exports = {
       md: '768px',
       // tablet
       lg: '1024px',
-      // tablet grande e notebook pequeno
+      // tablet
       xl: '1280px',
       // notebook
       '2xl': '1536px',

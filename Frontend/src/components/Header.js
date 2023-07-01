@@ -16,8 +16,8 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { RiUserFill } from 'react-icons/ri';
 import UserProfile from '../UserProfile';
 
-const Header = ({ user }, {update}) => {
-  const signOutUser = () => {UserProfile.setUsername(undefined); update();};
+const Header = ({ user , update}) => {
+  const signOutUser = () => {UserProfile.Reset(); update();};
   return (
     <header className='shadow-md bg-gray-50 '>
       <Root className='flex justify-between items-center max-w-[1200px] w-[90%] mx-auto py-4 '>
@@ -92,6 +92,22 @@ const Header = ({ user }, {update}) => {
                     className='px-4 text-yellow-400 transition-all duration-200 hover:text-black hover:font-bold hover:border-l-4 hover:border-l-yellow-400'
                   >
                     Favorites
+                  </Link>
+                </RadixLink>
+                <RadixLink>
+                  <Link
+                    to='/watched'
+                    className='px-4 text-yellow-400 transition-all duration-200 hover:text-black hover:font-bold hover:border-l-4 hover:border-l-yellow-400'
+                  >
+                    Watched
+                  </Link>
+                </RadixLink>
+                <RadixLink>
+                  <Link
+                    to='/watching'
+                    className='px-4 text-yellow-400 transition-all duration-200 hover:text-black hover:font-bold hover:border-l-4 hover:border-l-yellow-400'
+                  >
+                    Watching
                   </Link>
                 </RadixLink>
                 <RadixLink>

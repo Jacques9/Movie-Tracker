@@ -12,13 +12,17 @@ const Home = () => {
   const [loading, setLoading] = useState(movies===[]);
   const [search, setSearch] = useState(null);
   const [moviesFilter, setMoviesFilter] = useState([]);
+  const [error, setError] = useState(null);
   if(movies===[] || movies.length === 0)
   {
-    console.log("call");
     Manager.getAllMovies().then(
     (m)=>{
-      movies = m.data;
-      setSearch("");
+      if(m.response.ok){
+        movies = m.data;
+        setSearch("");
+      }else{
+        setError(m.data);
+      }
       setLoading(false);
     });
   }
@@ -31,8 +35,9 @@ const Home = () => {
       setMoviesFilter(filter);
     }
   }, [search]);
-  if (loading){
+  if (loading || error){
     return <div className='flex items-center justify-center w-full'>
+      <p>{error}</p>
     <Loading size={'30px'} />
   </div>;
   }
