@@ -1,5 +1,8 @@
 config.py
 node_modules
+package-lock.json
+test.js
+movie-tracker-7ab60-firebase-adminsdk-y16h6-fac369a8a5.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

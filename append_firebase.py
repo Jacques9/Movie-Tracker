@@ -26,4 +26,19 @@ def load_db_from_json():
     for thread in threads:
         thread.join()
 
+def edit_movies():
+    cred = credentials.Certificate('movie-tracker-7ab60-firebase-adminsdk-y16h6-fac369a8a5.json')
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    
+    collection_ref = db.collection('movies')
+
+    movies = collection_ref.get()
+
+    for movie in movies:
+        movie_dict = movie.to_dict()
+        movie_dict['reviews'] = []
+        movie.reference.set(movie_dict)
+
+
 load_db_from_json()

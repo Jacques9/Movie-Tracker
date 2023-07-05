@@ -44,3 +44,49 @@ class Movies:
             raise
         except Exception as e:
             raise HTTPException(status_code=500, detail='Failed to delete movie')
+    
+    def add_review(self, user_id: str, movie_id: str, text: str, stars: int):
+        review = {
+            'user_id': user_id,
+            'text': text,
+            'stars': stars
+        }
+
+        movie_data = self.fetch_movie_by_id(movie_id)
+        if 'reviews' not in movie_data:
+            movie_data['reviews'] = []
+
+        movie_ref = self.db.collection('movies').document(movie_id)
+        review_doc_ref = movie_ref.collection('reviews').document()
+        review_id = review_doc_ref.id
+
+        movie_data['reviews'] = [review_data for review_data in movie_data['reviews'] if review_data['review_id'] != review_id]
+        movie_data['reviews'].append({
+            'review_id': review_id,
+            'review_data': review
+        })
+
+        movie_ref.set(movie_data, merge=True)
+
+        user_ref = self.db.collection('users').document(user_id)
+        user_data = user_ref.get().to_dict()
+
+        if 'user_reviews' not in user_data:
+            user_data['user_reviews'] = []
+
+        user_data['user_reviews'].append(review_doc_ref)
+
+        user_ref.set(user_data, merge=True)
+
+        return {'message': 'Review added successfully.'}
+    
+    def get_movie_reviews(self, movie_id: str):
+        movie_ref = self.db.collection('movies').document(movie_id)
+        movie_doc = movie_ref.get()
+
+        if movie_doc.exists:
+            movie_data = movie_doc.to_dict()
+            reviews = [review['review_data'] for review in movie_data.get('reviews', [])]
+            return reviews
+        else:
+            raise HTTPException(status_code=404, detail='Movie not found')
