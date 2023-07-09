@@ -12,9 +12,33 @@ const Comments = ({ movie, user }) => {
   const [loading,setLoading] = useState(false);
   const [error,setError] = useState(undefined);
   const [movieReviews,setMovieReviews] = useState(movie.reviews);
-  console.log(movie.reviews);
+  const [users,setUsers] = useState(undefined);
+  if(users === undefined){
+    setUsers([1]);
+    setLoading(true);
+    Manager.getAllUsers().then(response=>{
+      setUsers(response.data);
+      setLoading(false);
+    });
+  }
   const deleteComment = (id) =>{ 
-
+    setLoading(true);
+    Manager.deleteReview(user,movie.id).then(m=>{
+      if(m.response.ok){
+        Manager.getMovieById(movie.id).then(
+          m=>{
+              m = m.data;
+              movie.reviews = m.reviews;
+              setMovieReviews(m.reviews);
+              setRating(undefined);
+              setReview(undefined); 
+              setLoading(false);
+          }
+        )
+      }else{
+        setError(m.data.message);
+        setLoading(false);
+    }})
   }
   const commentHandler = (e) => {
     e.preventDefault();
@@ -27,13 +51,12 @@ const Comments = ({ movie, user }) => {
       if(m.response.ok){
         Manager.getMovieById(movie.id).then(
           m=>{
-
-            m = m.data;
-            movie.reviews = m.reviews;
-            setMovieReviews(m.reviews);
-            setRating(undefined);
-            setReview(undefined); 
-            setLoading(false);
+              m = m.data;
+              movie.reviews = m.reviews;
+              setMovieReviews(m.reviews);
+              setRating(undefined);
+              setReview(undefined); 
+              setLoading(false);
           }
         )
       }else{
@@ -91,14 +114,14 @@ const Comments = ({ movie, user }) => {
           .map((comment, index) => (
             <div className='py-1 bg-slate-50' key={index}>
               <p className='mb-1 font-bold lg:text-xl float-right'>Rating: {comment.review_data.stars}</p>
-              <p className='mb-1 font-bold lg:text-xl '>{comment.review_data.user_id}</p>
+              <p className='mb-1 font-bold lg:text-xl '>{users?.find(user=>comment.review_data.user_id === user.id).username }</p>
               <div className='flex items-center justify-between w-full gap-4'>
                 <p className='w-full py-2 overflow-hidden text-sm italic text-gray-700 break-words'>
                   "{comment.review_data.text}"
                 </p>
                 {user === comment.review_data.user_id && (
                   <p
-                    onClick={() => deleteComment(comment.id)}
+                    onClick={() => deleteComment(comment.review_id)}
                     className='text-2xl text-red-500'
                   >
                     <TiDelete />

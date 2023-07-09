@@ -1,25 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { MdOutlineClose, MdCheck } from 'react-icons/md';
+import React, { useState } from 'react';
 import { FaUserAlt } from 'react-icons/fa';
 import Loading from '../components/Loading';
+import Manager from '../ApiManager';
 
 const Profile = ({ user }) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState(undefined);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [image, setImage] = useState('');
-
+  const [loading,setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  if(username===undefined){
+    setUsername("");
+    setLoading(true);
+    Manager.getAllUsers().then(response=>{
+      if(response.response.ok){
+        var temp = response.data.find(u=>u.id);
+        console.log(temp);
+        if(temp!== null)setUsername(temp.username);
+      }
+      setLoading(false);
+    });
+  }
   const handleUpdateProfile = (e) => {
     e.preventDefault();
     setError(null);
 
     if (
-      image === '' &&
       username === '' &&
-      email === '' &&
       password === '' &&
       confirmPassword === ''
     ) {
@@ -32,16 +39,14 @@ const Profile = ({ user }) => {
       return;
     }
 
-    if (image !== '') {
-      // updateImage(image);
-    }
-
     if (username !== '') {
-      // updateUsername(username);
-    }
-
-    if (email !== '') {
-      // updateUserEmail(email);
+      setLoading(true);
+      Manager.updateUsername(username,user).then((response)=>{
+        if(!response.response.ok)
+          setError(response.data);
+        setLoading(false)
+      });
+        
     }
 
     if (
@@ -49,44 +54,31 @@ const Profile = ({ user }) => {
       confirmPassword !== '' &&
       password === confirmPassword
     ) {
+      setLoading(true);
+      Manager.updatePassword(password,user).then(setLoading(false))
       // updateUserPassword(password);
     }
 
-    setImage('');
     setUsername('');
-    setEmail('');
     setPassword('');
     setConfirmPassword('');
     return;
   };
-
+  if (loading){
+    return <div className='flex items-center justify-center w-full'>
+      <Loading size={'30px'} />
+      </div>;
+  }
   return (
     <section className='flex flex-col items-center justify-center sectionHeight bg-amber-200'>
       <div className='flex flex-col w-[90%] mx-auto justify-center items-center my-16 gap-8 '>
-        {image && (
-          <img
-            src={URL.createObjectURL(image)}
-            alt='preview'
-            className='rounded-full w-[250px] h-[250px] object-cover border-4 border-zinc-800 shadow-md'
-          />
-        )}
 
-        {user.photoURL && !image && (
-          <img
-            src={user.photoURL}
-            alt='user'
-            className='rounded-full w-[250px] h-[250px] object-cover border-4 border-zinc-800 shadow-md'
-          />
-        )}
-
-        {!image && !user.photoURL && (
           <div className='flex justify-center items-center rounded-full w-[250px] h-[250px] object-cover border-4 border-zinc-800 shadow-md'>
             <FaUserAlt size={100} />
           </div>
-        )}
 
         <h1 className='pb-2 text-2xl font-bold border-b-4 sm:text-3xl md:text-3xl lg:text-4xl text-zinc-800 border-zinc-800'>
-          {user.displayName}
+          Hi, {username}!
         </h1>
       </div>
 
@@ -95,14 +87,14 @@ const Profile = ({ user }) => {
       '
         onSubmit={handleUpdateProfile}
       >
-        <div className='flex items-center w-full gap-3'>
-          {/* <input
+        {/* <div className='flex items-center w-full gap-3'>
+          <input
             type='file'
             className='block w-full p-4 m-0 text-base font-normal text-gray-700 transition ease-in-out border-none rounded shadow-md bg-slate-50 form-control bg-clip-padding focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
             onChange={(e) => setImage(e.target.files[0])}
-          /> */}
-        </div>
-        <div className='flex items-center w-full gap-3'>
+          />
+        </div> */}
+        {/* <div className='flex items-center w-full gap-3'>
           <input
             type='text'
             value={username || ''}
@@ -112,18 +104,8 @@ const Profile = ({ user }) => {
             placeholder='Username'
             className='w-full p-4 rounded-md shadow-md outline-none bg-slate-50'
           />
-        </div>
-        <div className='flex items-center w-full gap-3'>
-          <input
-            type='email'
-            value={email || ''}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            placeholder='E-mail'
-            className='w-full p-4 rounded-md shadow-md outline-none bg-slate-50'
-          />
-        </div>
+        </div> */}
+       
         <div className='flex items-center w-full gap-3'>
           <div className='flex flex-col w-full gap-3'>
             <input
@@ -152,7 +134,7 @@ const Profile = ({ user }) => {
 
           <input
             type='submit'
-            value='Update Profile'
+            value='Update Password'
             className='w-full p-4 font-bold text-white transition-all duration-300 rounded-md shadow-sm cursor-pointer bg-zinc-800 hover:bg-zinc-700 hover:tracking-wider'
           />
 

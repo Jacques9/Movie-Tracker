@@ -27,7 +27,6 @@ const Details = ({ user }) => {
     }
     if(!Number.isInteger(size))arr.push(0.5);
     while(arr.length<5)arr.push(-arr.length);
-    console.log(arr);
     return arr;
   };
   if (!movie) 
