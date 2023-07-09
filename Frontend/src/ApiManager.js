@@ -1,3 +1,4 @@
+import { async } from "q";
 
 const baseUrl = "http://localhost:8000/";
 const imagesUrl = "https://image.tmdb.org/t/p/original";
@@ -13,6 +14,8 @@ const getWatchingMoviesUrl = (id) => {return baseUrl + "user/watching/" + id;}
 const modifyWatchingMoviesUrl = (id,movie) => {return baseUrl + "user/watching/" + id + "/" + movie;}
 const addReviewUrl = ()=>{return baseUrl + "movie/review";}
 const getReviewUrl = (movie)=>{return baseUrl + "movie/reviews/" + movie;}  
+const modifyUsernameUrl = (id) => {return baseUrl + '/user/username'}
+const modifyPasswordUrl = (id) => {return baseUrl + '/user/password'}
 
 async function safeFetch(url,options){
     try{
@@ -198,6 +201,27 @@ async function getReviews(movie){
         headers: { 'Content-Type': 'application/json' },
     };
     const response = await safeFetch(getReviewUrl(), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+
+async function updateUsername(username,user_id){
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(modifyUsernameUrl(user_id) + `?new_username=${username}`, requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+
+async function deleteReview(){
+    const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        //body: JSON.stringify({ user_id: user, movie_id: movie, text: description, stars: rating })
+    };
+    const response = await safeFetch(addReviewUrl(), requestOptions);
     const data = await response.json();
     return {response: response, data: data};
 }

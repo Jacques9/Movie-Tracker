@@ -82,7 +82,7 @@ const Comments = ({ movie, user }) => {
       ) : (
         <p className='flex items-center justify-center gap-2 p-4 font-bold border-2 border-gray-500 rounded-md bg-slate-50 text-slate-400'>
           <FaLock className='mt-[-4px]' /> <Link to='/login'>Log in</Link> to
-          comment
+          leave a review
         </p>
       )}
       <div className='space-y-4'>
