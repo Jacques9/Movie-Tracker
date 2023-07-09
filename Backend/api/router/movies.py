@@ -26,3 +26,7 @@ def add_movie_review(user_id: str, movie_id: str, text: str, stars: int):
 @router.get('/reviews/{movie_id}')
 def get_movie_reviews(movie_id: str):
     return movies.get_movie_reviews(movie_id)
+
+@router.delete('/review/delete')
+def remove_review(user_id: str, movie_id: str):
+    return movies.delete_movie_review(user_id, movie_id)
