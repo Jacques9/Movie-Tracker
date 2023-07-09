@@ -48,17 +48,11 @@ const NewReview = ({ user }) => {
       <h1 className='my-8 sm:text-xl md:text-2xl font-bold text-zinc-800 w-[90%] text-center '>
         Add a new review
       </h1>
-      <div>
-      {target!==undefined && (<Card
-        image={target.poster_path}
-        title={target.title}
-        genre={target.genre_names}
-        rating={target.vote_average}
-      />)}
+      <div className='flex flex-col items-center justify-center max-w-[600px] w-[90%] mx-auto gap-3 mb-16'>
       <select
           className={`p-4  rounded-md shadow-md outline-none bg-slate-50 `}
-          //value={target ? target.title : "" }
-          onChange={(e) => setTarget(movies.find(m=>m.id===e.value))}
+          value={target ? target.id : ""}
+          onChange={(e) => setTarget(movies.find(m=>m.id===e.target.value))}
         >
           <option value='' className='disabled:text-gray-500' disabled>
             Movie
@@ -69,12 +63,14 @@ const NewReview = ({ user }) => {
             </option>
           ))}
         </select>
+        {target!==undefined && (<Card
+        image={target.poster_path}
+        title={target.title}
+        genre={target.genre_names}
+        rating={target.vote_average}
+      />)}
         </div>
       {target && (
-        <div><img
-          src={target.poster_path}
-          alt='preview'
-          className='max-w-[600px] w-[90%] object-cover mb-8 shadow-md rounded-md' />
           <form
             onSubmit={handleSubmit}
             className='flex flex-col max-w-[600px] w-[90%] mx-auto gap-3 mb-16'
@@ -97,7 +93,7 @@ const NewReview = ({ user }) => {
               type='submit'
               value={'Upload Review'}
               className='w-full p-4 font-bold text-white transition-all duration-300 rounded-md shadow-sm cursor-pointer bg-zinc-800 hover:bg-zinc-700 hover:tracking-wider' />
-          </form></div>
+          </form>
       )}
     </section>
   );

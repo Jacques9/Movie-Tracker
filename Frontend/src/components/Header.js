@@ -26,7 +26,7 @@ const Header = ({ user , update}) => {
           className='text-2xl font-bold transition-all duration-300 hover:tracking-wider'
         >
           Movie
-          <span className='text-yellow-400'>Tracker</span>
+          <span className='text-yellow-400'>Wise</span>
         </Link>
         <List className='relative top-[4px] '>
           {!user && (
