@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Loading from '../components/Loading';
 import Card from '../components/Card';
 import Manager from '../ApiManager';
@@ -12,10 +13,10 @@ const NewReview = ({ user }) => {
   const [rating, setRating] = useState(undefined);
   const handleSubmit = ()=>{
     setLoading(true);
-    Manager.addReview(user,target,rating,description).then(
+    Manager.addReview(user,target.id,rating,description).then(
       (m)=>{
         if(m.response.ok){
-          setTarget(undefined);
+          setTarget(undefined); 
         }else{
           setError(m.data);
         }
@@ -39,8 +40,8 @@ const NewReview = ({ user }) => {
   if (loading || error){
     return <div className='flex items-center justify-center w-full'>
       <p>{error}</p>
-    <Loading size={'30px'} />
-  </div>;
+      <Loading size={'30px'} />
+      </div>;
   }
 
   return (
@@ -63,12 +64,17 @@ const NewReview = ({ user }) => {
             </option>
           ))}
         </select>
-        {target!==undefined && (<Card
+        {target!==undefined && (<Link
+              key={target.id}
+              to={`/details/${target.id}`}
+              className='flex items-center'
+            ><Card
         image={target.poster_path}
         title={target.title}
         genre={target.genre_names}
         rating={target.vote_average}
-      />)}
+        on
+      /></Link>)}
         </div>
       {target && (
           <form

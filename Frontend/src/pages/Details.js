@@ -39,6 +39,7 @@ const Details = ({ user }) => {
           temp+= element + ", ";
         });
         result.data.genre = temp.slice(0,-2);
+        result.data.id=id;
         setMovie(result.data);
       }else{
         navigate("/");
@@ -106,8 +107,8 @@ const Details = ({ user }) => {
             <p className='text-justify lg:text-xl'>{movie.overview}</p>
           </div>
         </div>
-
-        {/* Comments section <Comments id={id} user={user} />*/}
+            
+        { <Comments movie={movie} user={user} />}
         
       </div>
     </section>

@@ -16,7 +16,8 @@ const getReviewUrl = (movie)=>{return baseUrl + "movie/reviews/" + movie;}
 
 async function safeFetch(url,options){
     try{
-        return await fetch(url,options);
+        var x = await fetch(url,options);
+        return x;
     }catch(e){
         return {ok: false, json:()=>{ return "Connection error"}};
     }
@@ -183,9 +184,10 @@ async function addReview(user,movie,rating,description){
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user, movie_id: movie, text: description, stars: rating })
+        //body: JSON.stringify({ user_id: user, movie_id: movie, text: description, stars: rating })
     };
-    const response = await safeFetch(addReviewUrl(), requestOptions);
+    console.log(JSON.stringify({ user_id: user, movie_id: movie, text: description, stars: rating }));
+    const response = await safeFetch(addReviewUrl() + `?user_id=${user}&movie_id=${movie}&text=${description}&stars=${rating}`, requestOptions);
     const data = await response.json();
     return {response: response, data: data};
 }
