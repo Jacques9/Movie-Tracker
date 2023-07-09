@@ -79,7 +79,9 @@ class Users:
 
                 if len(user_docs) > 0:
                     user_doc = user_docs[0]
+                    user_id = user_doc.id
                     user_type = user_doc.get('type')
+
 
                     auth.set_custom_user_claims(
                         uid,
@@ -88,7 +90,7 @@ class Users:
                         }
                     )
 
-                    return {'message': 'Login successful', 'idToken': response['idToken'], 'user_id': uid}
+                    return {'message': 'Login successful', 'idToken': response['idToken'], 'user_id': user_id}
                 else:
                     raise HTTPException(
                         status_code=404,
