@@ -1,5 +1,4 @@
 
-
 const baseUrl = "http://localhost:8000/";
 const imagesUrl = "https://image.tmdb.org/t/p/original";
 const registerUrl = baseUrl + "user/register";
@@ -12,6 +11,8 @@ const getWatchedMoviesUrl = (id) => {return baseUrl + "user/watched/" + id;}
 const modifyWatchedMoviesUrl = (id,movie) => {return baseUrl + "user/watched/" + id + "/" + movie;}
 const getWatchingMoviesUrl = (id) => {return baseUrl + "user/watching/" + id;}
 const modifyWatchingMoviesUrl = (id,movie) => {return baseUrl + "user/watching/" + id + "/" + movie;}
+const addReviewUrl = ()=>{return baseUrl + "movie/review";}
+const getReviewUrl = (movie)=>{return baseUrl + "movie/reviews/" + movie;}  
 
 async function safeFetch(url,options){
     try{
@@ -40,7 +41,7 @@ async function loginUser(email,password){
     const response = await safeFetch(loginUrl, requestOptions);
     const data = await response.json();
     if(response.ok){
-        data.id = "JPWmDAIwp4hpxnGlk8D0";
+        data.id = data.user_id;
         data.token = data.idToken;
         data.error = data.detail;
     }
@@ -178,6 +179,27 @@ async function removeMovieFromWatching(user,movie){
     const data = await response.json();
     return {response: response, data: data};
 }
+async function addReview(user,movie,rating,description){
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user, movie_id: movie, text: description, stars: rating })
+    };
+    const response = await safeFetch(addReviewUrl(), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+
+async function getReviews(movie){
+    const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const response = await safeFetch(getReviewUrl(), requestOptions);
+    const data = await response.json();
+    return {response: response, data: data};
+}
+
 const Manager = {
     registerNewUser, 
     loginUser,
@@ -192,5 +214,6 @@ const Manager = {
     removeMovieFromWatched,
     addMovieToWatching,
     removeMovieFromWatching,
+    addReview,
 }
 export default Manager;
