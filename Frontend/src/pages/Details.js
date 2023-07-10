@@ -27,7 +27,6 @@ const Details = ({ user }) => {
     }
     if(!Number.isInteger(size))arr.push(0.5);
     while(arr.length<5)arr.push(-arr.length);
-    console.log(arr);
     return arr;
   };
   if (!movie) 
@@ -39,6 +38,7 @@ const Details = ({ user }) => {
           temp+= element + ", ";
         });
         result.data.genre = temp.slice(0,-2);
+        result.data.id=id;
         setMovie(result.data);
       }else{
         navigate("/");
@@ -106,8 +106,8 @@ const Details = ({ user }) => {
             <p className='text-justify lg:text-xl'>{movie.overview}</p>
           </div>
         </div>
-
-        {/* Comments section <Comments id={id} user={user} />*/}
+            
+        { <Comments movie={movie} user={user} />}
         
       </div>
     </section>
